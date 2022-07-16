@@ -1,9 +1,9 @@
-import Form from "../componets/Form";
+import LoginForm from "../componets/LoginForm";
 
 export default function login() {
   return (
     <div>
-      <Form />
+      <LoginForm legend="Login Here" />
     </div>
   )
 }

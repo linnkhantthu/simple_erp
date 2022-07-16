@@ -1,0 +1,36 @@
+.form_container{
+  margin-top: 100px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+.form{
+  padding: 2%;
+  position: absolute;
+  border: 1px dotted green;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.form_input{
+  height: 30px;
+  width: 250px;
+}
+.form_button{
+  background-color: green;
+  border: 1px solid green;
+  color: white;
+  padding: 10px;
+  width:fit-content;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.form_button:hover{
+  background-color: lightgreen;
+  color: black;
+  transition: 1s all;
+}
+.error_text{
+  color: red;
+  margin-bottom: 20px;
+}
