@@ -1,20 +1,16 @@
 {
-  "name": "simple_erp",
-  "version": "0.1.0",
-  "private": true,
+  "entry_script": "start",
+  "entry_file": "pages/index.js",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "start": "next dev -p 3450",
+    "build": "next build && next export"
   },
   "dependencies": {
-    "next": "12.2.2",
-    "react": "18.2.0",
-    "react-dom": "18.2.0"
-  },
-  "devDependencies": {
-    "eslint": "8.19.0",
-    "eslint-config-next": "12.2.2"
+    "es6-promise": "^4.2.8",
+    "isomorphic-fetch": "^3.0.0",
+    "next": "9.3.5",
+    "node-fetch": "^3.2.8",
+    "react": "16.13.1",
+    "react-dom": "16.13.1"
   }
 }
