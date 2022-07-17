@@ -1,11 +1,11 @@
 import formStyles from "../styles/Form.module.css"
 
-const PasswordField = ({error_message}) => {
+const PasswordField = ({message}) => {
   return (
     <>
         <label htmlFor="Password"><small>Password</small></label>
-        <input type="Password" id="Password" className={formStyles.form_input}/>
-        <small className={formStyles.error_text}>{error_message}</small>
+        <input type="Password" id="Password" name="password" className={formStyles.form_input} required/>
+        <small className={formStyles.error_text}>{message}</small>
     </>
   )
 }
