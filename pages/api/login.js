@@ -1,16 +1,15 @@
 import { withIronSessionApiRoute } from "iron-session/next"
 import { PrismaClient } from '@prisma/client'
 
-const prisma = new PrismaClient()
-
 export default withIronSessionApiRoute(
   async function loginRoute(req, res) {
     let status_code
     let status
     let message
     let email
-    // res.status(200).json({ name: 'John Doe' })
+    
     if(req.method === 'POST'){
+      const user = await checkLogin(email, password)
       const data = req.body
       email = data.email
       const password = data.password
@@ -48,10 +47,14 @@ export default withIronSessionApiRoute(
   }
 )
 
-main()
-  .catch((e) => {
-    throw e
+async function checkLogin(email, password){
+  const prisma = new PrismaClient()
+  const user = await prisma.user.findFirst({
+    where:{
+      email: email,
+      password: password
+    }
   })
-  .finally(async () => {
-    await prisma.$disconnect()
-  })
+  await prisma.$disconnect()
+  return user
+}
