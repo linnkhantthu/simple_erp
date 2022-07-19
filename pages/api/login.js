@@ -1,4 +1,7 @@
 import { withIronSessionApiRoute } from "iron-session/next"
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
 
 export default withIronSessionApiRoute(
   async function loginRoute(req, res) {
@@ -44,3 +47,11 @@ export default withIronSessionApiRoute(
     }
   }
 )
+
+main()
+  .catch((e) => {
+    throw e
+  })
+  .finally(async () => {
+    await prisma.$disconnect()
+  })
