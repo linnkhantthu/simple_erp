@@ -9,12 +9,12 @@ export default withIronSessionApiRoute(
     let email
     
     if(req.method === 'POST'){
-      const user = await checkLogin(email, password)
       const data = req.body
       email = data.email
       const password = data.password
-      status_code = 200
-      if(email === "linnkhantthu1999mdy@gmail.com" && password === "12345678"){
+      const user = await checkLogin(email, password)
+      if(user){
+        status_code = 200
         email = email
         status = true
         message = "Logged in as " + email
@@ -47,7 +47,7 @@ export default withIronSessionApiRoute(
   }
 )
 
-async function checkLogin(email, password){
+export async function checkLogin(email, password){
   const prisma = new PrismaClient()
   const user = await prisma.user.findFirst({
     where:{

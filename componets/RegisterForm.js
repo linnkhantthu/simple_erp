@@ -26,14 +26,18 @@ const RegisterForm = ({legend}) => {
     }
     const res = await fetch(endpoint, options)
     const result = await res.json()
-    // if(result.status === false){
-    //   setMessage(
-    //     message = result.message
-    //   )
-    // }
-    // else{
-    //   router.push('/home')
-    // }
+    console.log(result.status)
+    if(result.status === false){
+      setMessage(
+        message = result.message
+      )
+    }
+    else{
+      router.push('/')
+      setMessage(
+        message = result.message
+      )
+    }
   }
 
   return (
@@ -42,7 +46,7 @@ const RegisterForm = ({legend}) => {
             <form onSubmit={register} className={formStyles.form}>
                 <h3>{legend}</h3>
 
-                <EmailField />
+                <EmailField message={message} />
                 <PasswordField />
                 <Button text="Register"/>
                 
