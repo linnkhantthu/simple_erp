@@ -4,6 +4,7 @@ import EmailField from "./EmailField"
 import PasswordField from "./PasswordField"
 import { useRouter } from "next/router"
 import { useState } from "react"
+import Message from './Message'
 
 const RegisterForm = ({legend}) => {
 
@@ -43,6 +44,7 @@ const RegisterForm = ({legend}) => {
   return (
     <>
         <div className={formStyles.form_container}>
+        <Message message={message} category="cyan" />
             <form onSubmit={register} className={formStyles.form}>
                 <h3>{legend}</h3>
 

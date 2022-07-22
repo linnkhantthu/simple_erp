@@ -4,6 +4,7 @@ import Button from "./Button"
 import EmailField from "./EmailField"
 import PasswordField from "./PasswordField"
 import { useRouter } from 'next/router'
+import Message from './Message'
 
 const LoginForm = ({legend}) => {
   const router = useRouter()
@@ -38,10 +39,11 @@ const LoginForm = ({legend}) => {
   return (
     <>
         <div className={formStyles.form_container}>
+        <Message message={message} category="cyan" />
             <form onSubmit={login} className={formStyles.form}>
                 <h3>{legend}</h3>
                 <EmailField />
-                <PasswordField message={message} />
+                <PasswordField />
                 <Button text="Login"/>
             </form>
         </div>
