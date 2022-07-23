@@ -56,4 +56,3 @@ experimental/**/*.db
 .nuxt
 dev.db
 *.env*
-migrations/
