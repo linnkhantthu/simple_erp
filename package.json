@@ -2,8 +2,9 @@
   "entry_script": "start",
   "entry_file": "pages/index.js",
   "scripts": {
-    "start": "next dev -p 3450",
-    "build": "next build"
+    "dev": "next",
+    "build": "next build",
+    "start": "next start -p $PORT"
   },
   "dependencies": {
     "@prisma/client": "^4.1.0",
