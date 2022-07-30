@@ -1,26 +1,20 @@
 import 'package:flutter/material.dart';
 
-class RegisterPage extends StatefulWidget {
-  const RegisterPage({Key? key}) : super(key: key);
+class LoginPage extends StatefulWidget {
+  const LoginPage({Key? key}) : super(key: key);
 
   @override
-  State<RegisterPage> createState() => _RegisterPageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _LoginPageState extends State<LoginPage> {
   late final TextEditingController _mail;
-  late final TextEditingController _firstName;
-  late final TextEditingController _lastName;
   late final TextEditingController _password;
-  late final TextEditingController _confirmPassword;
 
   @override
   void initState() {
     _mail = TextEditingController();
-    _firstName = TextEditingController();
-    _lastName = TextEditingController();
     _password = TextEditingController();
-    _confirmPassword = TextEditingController();
 
     super.initState();
   }
@@ -28,10 +22,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   void dispose() {
     _mail.dispose();
-    _firstName.dispose();
-    _lastName.dispose();
     _password.dispose();
-    _confirmPassword.dispose();
 
     super.dispose();
   }
@@ -54,7 +45,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   const Padding(
                     padding: EdgeInsets.all(10),
                     child: Text(
-                      "Register",
+                      "Login",
                       style: TextStyle(
                         fontSize: 20,
                       ),
@@ -71,34 +62,9 @@ class _RegisterPageState extends State<RegisterPage> {
                   Padding(
                     padding: const EdgeInsets.all(10),
                     child: TextField(
-                      controller: _firstName,
-                      decoration: const InputDecoration(
-                          border: OutlineInputBorder(), hintText: "First Name"),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: TextField(
-                      controller: _lastName,
-                      decoration: const InputDecoration(
-                          border: OutlineInputBorder(), hintText: "Last Name"),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: TextField(
                       controller: _password,
                       decoration: const InputDecoration(
                           border: OutlineInputBorder(), hintText: "Password"),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: TextField(
-                      controller: _confirmPassword,
-                      decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          hintText: "Confirm Password"),
                     ),
                   ),
                   Padding(
@@ -109,7 +75,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               Color.fromRGBO(211, 211, 211, 1))),
                       onPressed: () {},
                       child: const Text(
-                        "Register",
+                        "Login",
                         style: TextStyle(
                           color: Colors.black,
                         ),
