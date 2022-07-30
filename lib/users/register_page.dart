@@ -10,11 +10,21 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  // TextField controllers
   late final TextEditingController _mail;
   late final TextEditingController _firstName;
   late final TextEditingController _lastName;
   late final TextEditingController _password;
   late final TextEditingController _confirmPassword;
+
+  // Error Texts
+  var _mailErrorText = null;
+  var _firstNameErrorText;
+  var _lastNameErrorText;
+  var _passwordErrorText;
+  var _confirmPasswordErrorText;
+
+  // To register user
   late Future<User> futureUser;
 
   @override
@@ -24,6 +34,7 @@ class _RegisterPageState extends State<RegisterPage> {
     _lastName = TextEditingController();
     _password = TextEditingController();
     _confirmPassword = TextEditingController();
+
     super.initState();
   }
 
@@ -51,7 +62,6 @@ class _RegisterPageState extends State<RegisterPage> {
               width: 400,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                // mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   const Padding(
                     padding: EdgeInsets.all(10),
@@ -66,41 +76,50 @@ class _RegisterPageState extends State<RegisterPage> {
                     padding: const EdgeInsets.all(10),
                     child: TextField(
                       controller: _mail,
-                      decoration: const InputDecoration(
-                          border: OutlineInputBorder(), hintText: "Gmail"),
+                      decoration: InputDecoration(
+                          border: const OutlineInputBorder(),
+                          hintText: "Gmail",
+                          errorText: _mailErrorText),
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(10),
                     child: TextField(
                       controller: _firstName,
-                      decoration: const InputDecoration(
-                          border: OutlineInputBorder(), hintText: "First Name"),
+                      decoration: InputDecoration(
+                          border: const OutlineInputBorder(),
+                          hintText: "First Name",
+                          errorText: _firstNameErrorText),
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(10),
                     child: TextField(
                       controller: _lastName,
-                      decoration: const InputDecoration(
-                          border: OutlineInputBorder(), hintText: "Last Name"),
+                      decoration: InputDecoration(
+                          border: const OutlineInputBorder(),
+                          hintText: "Last Name",
+                          errorText: _lastNameErrorText),
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(10),
                     child: TextField(
                       controller: _password,
-                      decoration: const InputDecoration(
-                          border: OutlineInputBorder(), hintText: "Password"),
+                      decoration: InputDecoration(
+                          border: const OutlineInputBorder(),
+                          hintText: "Password",
+                          errorText: _passwordErrorText),
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(10),
                     child: TextField(
                       controller: _confirmPassword,
-                      decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          hintText: "Confirm Password"),
+                      decoration: InputDecoration(
+                          border: const OutlineInputBorder(),
+                          hintText: "Confirm Password",
+                          errorText: _confirmPasswordErrorText),
                     ),
                   ),
                   Padding(
@@ -111,10 +130,40 @@ class _RegisterPageState extends State<RegisterPage> {
                               const Color.fromRGBO(211, 211, 211, 1))),
                       onPressed: () async {
                         setState(() {
-                          futureUser = fetchUser(_firstName.text,
-                              _lastName.text, _mail.text, _password.text);
+                          _mailErrorText = (_mail.text != "")
+                              ? null
+                              : "This field can't be empty";
+                          _firstNameErrorText = (_firstName.text != "")
+                              ? null
+                              : "This field can't be empty";
+                          _lastNameErrorText = (_lastName.text != "")
+                              ? null
+                              : "This field can't be empty";
+                          _passwordErrorText = (_password.text != "")
+                              ? null
+                              : "This field can't be empty";
+                          _confirmPasswordErrorText =
+                              (_confirmPassword.text != "")
+                                  ? null
+                                  : "This field can't be empty";
+
+                          _confirmPasswordErrorText =
+                              (_confirmPassword.text != "" &&
+                                      _confirmPassword.text != _password.text)
+                                  ? "This field must be equal to Password field"
+                                  : null;
+                          if (_mailErrorText != null ||
+                              _firstNameErrorText != null ||
+                              _lastNameErrorText != null ||
+                              _passwordErrorText != null ||
+                              _confirmPasswordErrorText != null) {
+                          } else {
+                            try {
+                              futureUser = fetchUser(_firstName.text,
+                                  _lastName.text, _mail.text, _password.text);
+                            } catch (e) {}
+                          }
                         });
-                        print(await futureUser);
                       },
                       child: const Text(
                         "Register",
