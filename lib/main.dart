@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:simple_erp/users/login_page.dart';
 import 'package:simple_erp/users/register_page.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main() {
+Future<void> main() async {
+  await dotenv.load(fileName: ".env");
+  print(dotenv.env['API_URI']);
   runApp(const MyApp());
 }
 
