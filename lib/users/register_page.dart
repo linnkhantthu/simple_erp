@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:simple_erp/users/User.dart';
+import 'package:simple_erp/users/utils.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -13,6 +15,7 @@ class _RegisterPageState extends State<RegisterPage> {
   late final TextEditingController _lastName;
   late final TextEditingController _password;
   late final TextEditingController _confirmPassword;
+  late Future<User> futureUser;
 
   @override
   void initState() {
@@ -21,7 +24,6 @@ class _RegisterPageState extends State<RegisterPage> {
     _lastName = TextEditingController();
     _password = TextEditingController();
     _confirmPassword = TextEditingController();
-
     super.initState();
   }
 
@@ -106,8 +108,13 @@ class _RegisterPageState extends State<RegisterPage> {
                     child: TextButton(
                       style: ButtonStyle(
                           backgroundColor: MaterialStateProperty.all(
-                              Color.fromRGBO(211, 211, 211, 1))),
-                      onPressed: () {},
+                              const Color.fromRGBO(211, 211, 211, 1))),
+                      onPressed: () async {
+                        setState(() {
+                          futureUser = fetchUser(_firstName.text,
+                              _lastName.text, _mail.text, _password.text);
+                        });
+                      },
                       child: const Text(
                         "Register",
                         style: TextStyle(
