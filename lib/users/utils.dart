@@ -11,8 +11,7 @@ Future<User> fetchUser(
     String firstName, String lastName, String mail, String password) async {
   final url = Uri.parse("$protocol://$hostname:$port/register");
   final headers = {
-    "Accept": "application/json",
-    "Content-Type": "application/x-www-form-urlencoded"
+    "Content-Type": "application/json",
   };
   Map<String, dynamic> body = {
     'firstName': firstName,
@@ -20,14 +19,14 @@ Future<User> fetchUser(
     'mail': mail,
     'password': password,
   };
-  print(body);
   final encoding = Encoding.getByName('utf-8');
   final response = await http.post(
     url,
-    body: body,
+    headers: headers,
+    body: jsonEncode(body),
     encoding: encoding,
   );
-  if (response.statusCode == 201) {
+  if (response.statusCode == 200) {
     return User.fromJson(jsonDecode(response.body));
   } else {
     throw Exception('Fail to load user data');

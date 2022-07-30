@@ -114,6 +114,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           futureUser = fetchUser(_firstName.text,
                               _lastName.text, _mail.text, _password.text);
                         });
+                        print(await futureUser);
                       },
                       child: const Text(
                         "Register",
