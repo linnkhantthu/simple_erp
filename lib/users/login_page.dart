@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:simple_erp/users/Objects/User.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
-
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
@@ -29,6 +29,11 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    // final args = ModalRoute.of(context)!.settings.arguments as ScreenArguments;
+    final args = ModalRoute.of(context)!.settings.arguments as User;
+    setState(() {
+      _mail.text = args.mail;
+    });
     return Scaffold(
         appBar: AppBar(
           title: const Text("SimpleERP"),

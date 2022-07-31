@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
-import 'package:simple_erp/users/ErrorMessage.dart';
-import 'package:simple_erp/users/User.dart';
+import 'package:simple_erp/users/Objects/ErrorMessage.dart';
+import 'package:simple_erp/users/Objects/User.dart';
 
 var protocol = dotenv.env['PROTOCOL'];
 var hostname = dotenv.env['HOST_NAME'];
