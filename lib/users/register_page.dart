@@ -64,7 +64,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Padding(
-                    padding: EdgeInsets.all(10),
+                    padding: EdgeInsets.all(8),
                     child: Text(
                       "Register",
                       style: TextStyle(
@@ -73,7 +73,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(8),
                     child: TextField(
                       controller: _mail,
                       decoration: InputDecoration(
@@ -83,7 +83,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(8),
                     child: TextField(
                       controller: _firstName,
                       decoration: InputDecoration(
@@ -93,7 +93,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(8),
                     child: TextField(
                       controller: _lastName,
                       decoration: InputDecoration(
@@ -103,7 +103,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(8),
                     child: TextField(
                       controller: _password,
                       decoration: InputDecoration(
@@ -113,7 +113,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(8),
                     child: TextField(
                       controller: _confirmPassword,
                       decoration: InputDecoration(
@@ -123,7 +123,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(8),
                     child: TextButton(
                       style: ButtonStyle(
                           backgroundColor: MaterialStateProperty.all(
@@ -161,7 +161,11 @@ class _RegisterPageState extends State<RegisterPage> {
                             try {
                               futureUser = fetchUser(_firstName.text,
                                   _lastName.text, _mail.text, _password.text);
-                            } catch (e) {}
+                              futureUser
+                                  .then((value) => print(value.firstName));
+                            } catch (e) {
+                              print(e);
+                            }
                           }
                         });
                       },
