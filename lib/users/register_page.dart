@@ -19,13 +19,13 @@ class _RegisterPageState extends State<RegisterPage> {
 
   // Error Texts
   var _mailErrorText = null;
-  var _firstNameErrorText;
-  var _lastNameErrorText;
-  var _passwordErrorText;
-  var _confirmPasswordErrorText;
+  var _firstNameErrorText = null;
+  var _lastNameErrorText = null;
+  var _passwordErrorText = null;
+  var _confirmPasswordErrorText = null;
 
   // To register user
-  late Future<User> futureUser;
+  late Future<Object> futureUser;
 
   @override
   void initState() {
@@ -161,11 +161,13 @@ class _RegisterPageState extends State<RegisterPage> {
                             try {
                               futureUser = fetchUser(_firstName.text,
                                   _lastName.text, _mail.text, _password.text);
-                              futureUser
-                                  .then((value) => print(value.firstName));
-                            } catch (e) {
-                              print(e);
-                            }
+                              futureUser.then((value) => {
+                                    if (value.runtimeType == User)
+                                      {print("User Registered")}
+                                    else
+                                      {print("User already exists")}
+                                  });
+                            } catch (e) {}
                           }
                         });
                       },
