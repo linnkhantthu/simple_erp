@@ -29,11 +29,13 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    // final args = ModalRoute.of(context)!.settings.arguments as ScreenArguments;
-    final args = ModalRoute.of(context)!.settings.arguments as User;
-    setState(() {
-      _mail.text = args.mail;
-    });
+    final args = ModalRoute.of(context)!.settings.arguments;
+    if (args != null) {
+      final user = args as User;
+      setState(() {
+        _mail.text = user.mail;
+      });
+    }
     return Scaffold(
         appBar: AppBar(
           title: const Text("SimpleERP"),

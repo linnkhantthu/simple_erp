@@ -135,6 +135,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 const Color.fromRGBO(211, 211, 211, 1))),
                         onPressed: () async {
                           setState(() {
+                            // Check if the fields are empty
                             _mailErrorText = (_mail.text != "")
                                 ? null
                                 : "This field can't be empty";
@@ -165,7 +166,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 _confirmPasswordErrorText != null) {
                             } else {
                               try {
-                                _isLoading = true;
+                                _isLoading = true; // Display the progress bar
                                 futureUser = registerUser(_firstName.text,
                                     _lastName.text, _mail.text, _password.text);
                                 futureUser.then((value) {
@@ -197,6 +198,15 @@ class _RegisterPageState extends State<RegisterPage> {
                             color: Colors.black,
                           ),
                         ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: GestureDetector(
+                        child: const Text("Already have an account?"),
+                        onTap: () {
+                          Navigator.pushNamed(context, '/login');
+                        },
                       ),
                     )
                   ],
