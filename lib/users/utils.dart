@@ -38,3 +38,31 @@ Future<Object> registerUser(
     throw Exception("404 not Found");
   }
 }
+
+Future<Object> loginUser(String mail, String password) async {
+  final url = Uri.parse("$protocol://$hostname:$port/login");
+  final headers = {
+    "Content-Type": "application/json",
+  };
+  Map<String, dynamic> body = {
+    'mail': mail,
+    'password': password,
+  };
+  final encoding = Encoding.getByName('utf-8');
+  final response = await http.post(
+    url,
+    headers: headers,
+    body: jsonEncode(body),
+    encoding: encoding,
+  );
+  dynamic jsonBody = jsonDecode(response.body);
+  if (response.statusCode == 200) {
+    if (jsonBody['status']) {
+      return User.fromJson(jsonBody['data']);
+    } else {
+      return ErrorText.fromJson(jsonBody['data']);
+    }
+  } else {
+    throw Exception("404 not Found");
+  }
+}

@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:simple_erp/users/Objects/ErrorMessage.dart';
 import 'package:simple_erp/users/Objects/User.dart';
+import 'package:simple_erp/users/utils.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -10,6 +14,10 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   late final TextEditingController _mail;
   late final TextEditingController _password;
+  var _flashMessage = null;
+  var _mailErrorText = null;
+  var _passwordErrorText = null;
+  late Future<Object> futureUser;
 
   @override
   void initState() {
@@ -33,6 +41,7 @@ class _LoginPageState extends State<LoginPage> {
     if (args != null) {
       final user = args as User;
       setState(() {
+        _flashMessage = user.mail;
         _mail.text = user.mail;
       });
     }
@@ -47,10 +56,18 @@ class _LoginPageState extends State<LoginPage> {
               width: 400,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                // mainAxisAlignment: MainAxisAlignment.start,
                 children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Text(
+                      (_flashMessage != null)
+                          ? "Registered as $_flashMessage"
+                          : "",
+                      style: const TextStyle(color: Colors.green),
+                    ),
+                  ),
                   const Padding(
-                    padding: EdgeInsets.all(10),
+                    padding: EdgeInsets.all(8),
                     child: Text(
                       "Login",
                       style: TextStyle(
@@ -59,28 +76,72 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(8),
                     child: TextField(
                       controller: _mail,
-                      decoration: const InputDecoration(
-                          border: OutlineInputBorder(), hintText: "Gmail"),
+                      decoration: InputDecoration(
+                          border: const OutlineInputBorder(),
+                          hintText: "Gmail",
+                          errorText: _mailErrorText),
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(8),
                     child: TextField(
                       controller: _password,
-                      decoration: const InputDecoration(
-                          border: OutlineInputBorder(), hintText: "Password"),
+                      decoration: InputDecoration(
+                          border: const OutlineInputBorder(),
+                          hintText: "Password",
+                          errorText: _passwordErrorText),
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(8),
                     child: TextButton(
                       style: ButtonStyle(
                           backgroundColor: MaterialStateProperty.all(
-                              Color.fromRGBO(211, 211, 211, 1))),
-                      onPressed: () {},
+                              const Color.fromRGBO(211, 211, 211, 1))),
+                      onPressed: () {
+                        setState(() {
+                          // Check if the fields are empty
+                          _mailErrorText = (_mail.text != "")
+                              ? null
+                              : "This field can't be empty";
+
+                          _passwordErrorText = (_password.text != "")
+                              ? null
+                              : "This field can't be empty";
+
+                          if (_mailErrorText != null ||
+                              _passwordErrorText != null) {
+                          } else {
+                            try {
+                              // Display the progress bar
+                              futureUser =
+                                  loginUser(_mail.text, _password.text);
+                              futureUser.then((value) {
+                                if (value is User) {
+                                  print("Logged in as ${value.firstName}");
+                                  final box = GetStorage(
+                                      dotenv.env['SECRET_KEY'].toString());
+                                  () async => await box.write(
+                                      'current_user', value.firstName);
+                                  print("Stored: ${box.read('current_user')}");
+                                  Navigator.pushReplacementNamed(
+                                      context, "/dashboard");
+                                } else {
+                                  setState(() {
+                                    _mailErrorText =
+                                        (value as ErrorText).message;
+                                  });
+                                }
+                              });
+                            } catch (e) {
+                              throw Exception(e);
+                            }
+                          }
+                        });
+                      },
                       child: const Text(
                         "Login",
                         style: TextStyle(

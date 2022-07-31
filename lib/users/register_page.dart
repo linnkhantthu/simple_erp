@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:simple_erp/users/Objects/ErrorMessage.dart';
 import 'package:simple_erp/users/Objects/User.dart';
 import 'package:simple_erp/users/utils.dart';
@@ -18,6 +20,7 @@ class _RegisterPageState extends State<RegisterPage> {
   late final TextEditingController _password;
   late final TextEditingController _confirmPassword;
   bool _isLoading = false;
+  late final currentUser;
 
   // Error Texts
   var _mailErrorText = null;
@@ -36,7 +39,13 @@ class _RegisterPageState extends State<RegisterPage> {
     _lastName = TextEditingController();
     _password = TextEditingController();
     _confirmPassword = TextEditingController();
-
+    currentUser = () async =>
+        await GetStorage(dotenv.env['SECRET_KEY'].toString())
+            .read('current_user');
+    WidgetsBinding.instance.addPostFrameCallback((_) => {
+          if (currentUser != null)
+            {Navigator.pushReplacementNamed(context, '/dashboard')}
+        });
     super.initState();
   }
 
@@ -174,8 +183,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                     setState(() {
                                       _isLoading = false;
                                     });
-                                    Navigator.pushReplacementNamed(
-                                        context, '/login',
+                                    Navigator.pushNamed(context, '/login',
                                         arguments: value);
                                   } else {
                                     setState(() {

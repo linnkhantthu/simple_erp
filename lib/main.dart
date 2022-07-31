@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:simple_erp/dashboard.dart';
 import 'package:simple_erp/users/login_page.dart';
 import 'package:simple_erp/users/register_page.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:get_storage/get_storage.dart';
 
 Future<void> main() async {
   await dotenv.load(fileName: ".env");
+  await GetStorage.init(dotenv.env['SECRET_KEY'].toString());
   runApp(const MyApp());
 }
 
@@ -20,6 +23,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => const RegisterPage(),
         '/login': (context) => const LoginPage(),
+        '/dashboard': (context) => const Dashboard(),
       },
     );
   }
