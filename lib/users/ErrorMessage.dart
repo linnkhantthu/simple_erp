@@ -1,9 +1,9 @@
-class errorText {
+class ErrorText {
   final String message;
 
-  const errorText({required this.message});
+  const ErrorText({required this.message});
 
-  factory errorText.fromJson(Map<String, dynamic> json) {
-    return errorText(message: json['message']);
+  factory ErrorText.fromJson(Map<String, dynamic> json) {
+    return ErrorText(message: json['message']);
   }
 }

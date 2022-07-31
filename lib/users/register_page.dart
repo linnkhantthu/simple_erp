@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:simple_erp/users/ErrorMessage.dart';
 import 'package:simple_erp/users/User.dart';
 import 'package:simple_erp/users/utils.dart';
 
@@ -159,15 +160,23 @@ class _RegisterPageState extends State<RegisterPage> {
                               _confirmPasswordErrorText != null) {
                           } else {
                             try {
-                              futureUser = fetchUser(_firstName.text,
+                              futureUser = registerUser(_firstName.text,
                                   _lastName.text, _mail.text, _password.text);
-                              futureUser.then((value) => {
-                                    if (value.runtimeType == User)
-                                      {print("User Registered")}
-                                    else
-                                      {print("User already exists")}
+                              futureUser.then((value) {
+                                if (value is User) {
+                                  Navigator.pushReplacementNamed(
+                                      context, '/login',
+                                      arguments: (value as User));
+                                } else {
+                                  setState(() {
+                                    _mailErrorText =
+                                        (value as ErrorText).message;
                                   });
-                            } catch (e) {}
+                                }
+                              });
+                            } catch (e) {
+                              print(e);
+                            }
                           }
                         });
                       },

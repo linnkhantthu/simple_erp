@@ -8,7 +8,7 @@ var protocol = dotenv.env['PROTOCOL'];
 var hostname = dotenv.env['HOST_NAME'];
 var port = dotenv.env['PORT'];
 
-Future<Object> fetchUser(
+Future<Object> registerUser(
     String firstName, String lastName, String mail, String password) async {
   final url = Uri.parse("$protocol://$hostname:$port/register");
   final headers = {
@@ -32,7 +32,7 @@ Future<Object> fetchUser(
     if (jsonBody['status']) {
       return User.fromJson(jsonBody['data']);
     } else {
-      return errorText.fromJson(jsonBody['data']);
+      return ErrorText.fromJson(jsonBody['data']);
     }
   } else {
     throw Exception("404 not Found");
