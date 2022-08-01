@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:simple_erp/users/Objects/ErrorMessage.dart';
 import 'package:simple_erp/users/Objects/User.dart';
 import 'package:simple_erp/users/utils.dart';
@@ -23,7 +21,10 @@ class _LoginPageState extends State<LoginPage> {
   void initState() {
     _mail = TextEditingController();
     _password = TextEditingController();
-
+    WidgetsBinding.instance.addPostFrameCallback((_) => {
+          if (getCurrentUser('current_user') != null)
+            {Navigator.pushReplacementNamed(context, '/dashboard')}
+        });
     super.initState();
   }
 
@@ -121,12 +122,9 @@ class _LoginPageState extends State<LoginPage> {
                                   loginUser(_mail.text, _password.text);
                               futureUser.then((value) {
                                 if (value is User) {
-                                  print("Logged in as ${value.firstName}");
-                                  final box = GetStorage(
-                                      dotenv.env['SECRET_KEY'].toString());
-                                  () async => await box.write(
-                                      'current_user', value.firstName);
-                                  print("Stored: ${box.read('current_user')}");
+                                  setCurrentUser(
+                                      'current_user', value.toJson());
+
                                   Navigator.pushReplacementNamed(
                                       context, "/dashboard");
                                 } else {

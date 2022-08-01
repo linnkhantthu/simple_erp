@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+
 class User {
   final int id;
   final String firstName;
@@ -18,4 +20,7 @@ class User {
       mail: json['mail'],
     );
   }
+
+  Map<String, dynamic> toJson() =>
+      {'id': id, 'firstName': firstName, 'lastName': lastName, 'mail': mail};
 }

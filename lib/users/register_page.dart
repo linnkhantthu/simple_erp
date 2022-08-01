@@ -20,7 +20,6 @@ class _RegisterPageState extends State<RegisterPage> {
   late final TextEditingController _password;
   late final TextEditingController _confirmPassword;
   bool _isLoading = false;
-  late final currentUser;
 
   // Error Texts
   var _mailErrorText = null;
@@ -39,11 +38,8 @@ class _RegisterPageState extends State<RegisterPage> {
     _lastName = TextEditingController();
     _password = TextEditingController();
     _confirmPassword = TextEditingController();
-    currentUser = () async =>
-        await GetStorage(dotenv.env['SECRET_KEY'].toString())
-            .read('current_user');
     WidgetsBinding.instance.addPostFrameCallback((_) => {
-          if (currentUser != null)
+          if (getCurrentUser('current_user') == null)
             {Navigator.pushReplacementNamed(context, '/dashboard')}
         });
     super.initState();
