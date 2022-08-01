@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:simple_erp/dashboard.dart';
 import 'package:simple_erp/users/Objects/ErrorMessage.dart';
 import 'package:simple_erp/users/Objects/User.dart';
 import 'package:simple_erp/users/utils.dart';
@@ -22,8 +23,13 @@ class _LoginPageState extends State<LoginPage> {
     _mail = TextEditingController();
     _password = TextEditingController();
     WidgetsBinding.instance.addPostFrameCallback((_) => {
-          if (getCurrentUser('current_user') != null)
-            {Navigator.pushReplacementNamed(context, '/dashboard')}
+          if (getCurrentUser('current_user') is User)
+            {
+              Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                      builder: (BuildContext context) => const Dashboard()),
+                  (Route<dynamic> route) => false)
+            }
         });
     super.initState();
   }
@@ -125,8 +131,11 @@ class _LoginPageState extends State<LoginPage> {
                                   setCurrentUser(
                                       'current_user', value.toJson());
 
-                                  Navigator.pushReplacementNamed(
-                                      context, "/dashboard");
+                                  Navigator.of(context).pushAndRemoveUntil(
+                                      MaterialPageRoute(
+                                          builder: (BuildContext context) =>
+                                              const Dashboard()),
+                                      (Route<dynamic> route) => false);
                                 } else {
                                   setState(() {
                                     _mailErrorText =

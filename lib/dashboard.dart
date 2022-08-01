@@ -1,5 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:simple_erp/users/Objects/ErrorMessage.dart';
+import 'package:simple_erp/users/Objects/User.dart';
+import 'package:simple_erp/users/login_page.dart';
 import 'package:simple_erp/users/utils.dart';
 
 class Dashboard extends StatefulWidget {
@@ -16,16 +19,29 @@ class _DashboardState extends State<Dashboard> {
   void initState() {
     currentUser = getCurrentUser('current_user');
     WidgetsBinding.instance.addPostFrameCallback((_) => {
-          if (currentUser == null)
-            {Navigator.pushReplacementNamed(context, '/login')}
+          if (currentUser is ErrorText)
+            {
+              Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                      builder: (BuildContext context) => const LoginPage()),
+                  (Route<dynamic> route) => false)
+            }
         });
-    var jsonData = currentUser.toString();
-    print(" DASHBOARD : ${jsonDecode(jsonEncode(jsonData))[0]}");
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Text('Dashboard');
+    return Scaffold(
+      appBar: AppBar(
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {},
+            child: const Text("Logout"),
+          ),
+        ],
+        title: Text('Dashboard ${(currentUser as User).firstName}'),
+      ),
+    );
   }
 }

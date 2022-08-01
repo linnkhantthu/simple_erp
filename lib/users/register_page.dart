@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:simple_erp/dashboard.dart';
 import 'package:simple_erp/users/Objects/ErrorMessage.dart';
 import 'package:simple_erp/users/Objects/User.dart';
 import 'package:simple_erp/users/utils.dart';
@@ -39,8 +40,13 @@ class _RegisterPageState extends State<RegisterPage> {
     _password = TextEditingController();
     _confirmPassword = TextEditingController();
     WidgetsBinding.instance.addPostFrameCallback((_) => {
-          if (getCurrentUser('current_user') == null)
-            {Navigator.pushReplacementNamed(context, '/dashboard')}
+          if (getCurrentUser('current_user') is User)
+            {
+              Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                      builder: (BuildContext context) => const Dashboard()),
+                  (Route<dynamic> route) => false)
+            }
         });
     super.initState();
   }

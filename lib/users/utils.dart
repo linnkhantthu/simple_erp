@@ -75,8 +75,11 @@ void setCurrentUser(String key, value) {
 
 Object? getCurrentUser(String key) {
   var ans = box.read(key);
-  print("Got user : $ans");
-  return ans;
+  if (ans == null) {
+    return const ErrorText(message: "You need to login first");
+  } else {
+    return User.fromJson(ans);
+  }
 }
 
 void removeCurrentUser(String key) {
