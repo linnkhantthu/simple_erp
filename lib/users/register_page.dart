@@ -39,15 +39,16 @@ class _RegisterPageState extends State<RegisterPage> {
     _lastName = TextEditingController();
     _password = TextEditingController();
     _confirmPassword = TextEditingController();
-    WidgetsBinding.instance.addPostFrameCallback((_) => {
-          if (getCurrentUser('current_user') is User)
-            {
-              Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(
-                      builder: (BuildContext context) => const Dashboard()),
-                  (Route<dynamic> route) => false)
-            }
-        });
+    var currentUser = getCurrentUser('current_user');
+    if (currentUser is User) {
+      _isLoading = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) => {
+            Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                    builder: (BuildContext context) => const Dashboard()),
+                (Route<dynamic> route) => false),
+          });
+    }
     super.initState();
   }
 
