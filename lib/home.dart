@@ -73,6 +73,7 @@ class _HomeState extends State<Home> {
                 ),
               ),
               ListTile(
+                leading: const Icon(Icons.dashboard),
                 title: const Text("Dashboard"),
                 onTap: () {
                   setState(() {
@@ -82,6 +83,7 @@ class _HomeState extends State<Home> {
                 },
               ),
               ListTile(
+                leading: const Icon(Icons.inventory),
                 title: const Text("Inventory"),
                 onTap: () {
                   setState(() {

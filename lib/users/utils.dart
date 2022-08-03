@@ -42,7 +42,7 @@ Future<Object> registerUser(
 }
 
 Future<Object> loginUser(String mail, String password) async {
-  final url = Uri.parse("$protocol://$hostname:$port/login");
+  final url = Uri.parse("$protocol://$hostname/login");
   final headers = {
     "Content-Type": "application/json",
   };
