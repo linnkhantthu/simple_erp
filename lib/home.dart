@@ -96,7 +96,11 @@ class _HomeState extends State<Home> {
             ],
           ),
         ),
-        body: SingleChildScrollView(child: FittedBox(child: _homeWidget)),
+        body: Center(
+          child: SingleChildScrollView(
+            child: FittedBox(child: _homeWidget),
+          ),
+        ),
       );
     }
   }

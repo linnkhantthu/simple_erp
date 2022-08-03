@@ -10,7 +10,7 @@ var protocol = dotenv.env['PROTOCOL'];
 var hostname = dotenv.env['HOST_NAME'];
 var port = dotenv.env['PORT'];
 
-Future<Object> fetchInventory() async {
+Future<List<Object>> fetchInventory() async {
   var currentUser = getCurrentUser('current_user');
   var mail = (currentUser as User).mail;
   final url = Uri.parse("$protocol://$hostname/inventory");
@@ -28,11 +28,16 @@ Future<Object> fetchInventory() async {
     encoding: encoding,
   );
   dynamic jsonBody = jsonDecode(response.body);
+
   if (response.statusCode == 200) {
     if (jsonBody['status']) {
-      return Product.fromJson(jsonBody['data']);
+      List<Product> products = [];
+      for (var element in jsonBody['data']) {
+        products.add(Product.fromJson(element));
+      }
+      return products;
     } else {
-      return ErrorText.fromJson(jsonBody['data']);
+      return [ErrorText.fromJson(jsonBody['data'])];
     }
   } else {
     throw Exception("404 not Found");
