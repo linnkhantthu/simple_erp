@@ -12,7 +12,7 @@ final box = GetStorage();
 
 Future<Object> registerUser(
     String firstName, String lastName, String mail, String password) async {
-  final url = Uri.parse("$protocol://$hostname:$port/register");
+  final url = Uri.parse("$protocol://$hostname/register");
   final headers = {
     "Content-Type": "application/json",
   };
