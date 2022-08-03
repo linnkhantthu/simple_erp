@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:simple_erp/dashboard.dart';
+import 'package:simple_erp/home.dart';
 import 'package:simple_erp/users/Objects/ErrorMessage.dart';
 import 'package:simple_erp/users/Objects/User.dart';
 import 'package:simple_erp/users/utils.dart';
@@ -45,7 +45,7 @@ class _RegisterPageState extends State<RegisterPage> {
       WidgetsBinding.instance.addPostFrameCallback((_) => {
             Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(
-                    builder: (BuildContext context) => const Dashboard()),
+                    builder: (BuildContext context) => const Home()),
                 (Route<dynamic> route) => false),
           });
     }

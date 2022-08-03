@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:simple_erp/dashboard.dart';
+import 'package:simple_erp/home.dart';
 import 'package:simple_erp/users/Objects/User.dart';
 import 'package:simple_erp/users/login_page.dart';
 import 'package:simple_erp/users/register_page.dart';
@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
     var currentUser = getCurrentUser("current_user");
     var initialRoute = "/";
     if (currentUser is User) {
-      initialRoute = "/dashboard";
+      initialRoute = "/home";
     }
     return MaterialApp(
       title: "SimpleERP",
@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => const RegisterPage(),
         '/login': (context) => const LoginPage(),
-        '/dashboard': (context) => const Dashboard(),
+        '/home': (context) => const Home(),
       },
     );
   }

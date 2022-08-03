@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:simple_erp/dashboard.dart';
+import 'package:simple_erp/home.dart';
 import 'package:simple_erp/users/Objects/ErrorMessage.dart';
 import 'package:simple_erp/users/Objects/User.dart';
 import 'package:simple_erp/users/register_page.dart';
@@ -30,7 +30,7 @@ class _LoginPageState extends State<LoginPage> {
       WidgetsBinding.instance.addPostFrameCallback((_) => {
             Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(
-                    builder: (BuildContext context) => const Dashboard()),
+                    builder: (BuildContext context) => const Home()),
                 (Route<dynamic> route) => false),
           });
     }
@@ -130,6 +130,7 @@ class _LoginPageState extends State<LoginPage> {
                             } else {
                               try {
                                 // Display the progress bar
+                                _isLoading = true;
                                 futureUser =
                                     loginUser(_mail.text, _password.text);
                                 futureUser.then((value) {
@@ -140,7 +141,7 @@ class _LoginPageState extends State<LoginPage> {
                                     Navigator.of(context).pushAndRemoveUntil(
                                         MaterialPageRoute(
                                             builder: (BuildContext context) =>
-                                                const Dashboard()),
+                                                const Home()),
                                         (Route<dynamic> route) => false);
                                   } else {
                                     setState(() {
@@ -148,6 +149,9 @@ class _LoginPageState extends State<LoginPage> {
                                           (value as ErrorText).message;
                                     });
                                   }
+                                  setState(() {
+                                    _isLoading = false;
+                                  });
                                 });
                               } catch (e) {
                                 throw Exception(e);
