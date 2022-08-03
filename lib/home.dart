@@ -17,7 +17,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   late Object? currentUser;
   bool _isLoading = false;
-  Widget _homeWidget = Dashboard();
+  Widget _homeWidget = const Dashboard();
 
   @override
   void initState() {

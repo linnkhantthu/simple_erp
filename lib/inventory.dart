@@ -1,8 +1,4 @@
-import 'dart:convert';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:simple_erp/inventory/Objects/Product.dart';
 
 class Inventory extends StatefulWidget {
@@ -28,7 +24,7 @@ class _InventoryState extends State<Inventory> {
       "productName": "Hat",
       "contains": 100,
       "unit": "PCS",
-      "price": 2500,
+      "price": 2500.0,
       "qty": 200,
     },
     {
@@ -36,7 +32,7 @@ class _InventoryState extends State<Inventory> {
       "productName": "Shoes",
       "contains": 50,
       "unit": "PCS",
-      "price": 25000,
+      "price": 25000.0,
       "qty": 150,
     },
     {
@@ -44,7 +40,7 @@ class _InventoryState extends State<Inventory> {
       "productName": "iPad",
       "contains": 1,
       "unit": "PCS",
-      "price": 1100000,
+      "price": 1100000.0,
       "qty": 5,
     },
   ];
