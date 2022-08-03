@@ -40,6 +40,7 @@ class _HomeState extends State<Home> {
       return progressBar();
     } else {
       return Scaffold(
+        resizeToAvoidBottomInset: true,
         appBar: AppBar(
           actions: <Widget>[
             FlatButton(
@@ -95,7 +96,7 @@ class _HomeState extends State<Home> {
             ],
           ),
         ),
-        body: _homeWidget,
+        body: SingleChildScrollView(child: FittedBox(child: _homeWidget)),
       );
     }
   }
