@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:simple_erp/inventory/Objects/Product.dart';
+import 'package:simple_erp/inventory/addProduct.dart';
 import 'package:simple_erp/inventory/utils.dart';
 import 'package:simple_erp/users/register_page.dart';
 
@@ -38,11 +39,19 @@ class _InventoryState extends State<Inventory> {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              // const Text("Inventory"),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextButton(
-                  onPressed: () {},
+                  onPressed: () => showDialog(
+                    context: context,
+                    builder: (context) => const SizedBox(
+                      width: 200,
+                      height: 500,
+                      child: Dialog(
+                        child: AddProduct(),
+                      ),
+                    ),
+                  ),
                   style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all(Colors.green)),
                   child: const Text(
