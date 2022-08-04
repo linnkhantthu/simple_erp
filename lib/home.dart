@@ -18,6 +18,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   late Object? currentUser;
   bool _isLoading = false;
+  String routeName = "Dashboard";
   Widget _homeWidget = const Dashboard();
 
   @override
@@ -43,7 +44,7 @@ class _HomeState extends State<Home> {
       return Scaffold(
         resizeToAvoidBottomInset: true,
         appBar: AppBar(
-          title: Text('Dashboard ${(currentUser as User).firstName}'),
+          title: Text('$routeName (${(currentUser as User).firstName})'),
         ),
         drawer: Container(
           width: 250,
@@ -70,6 +71,7 @@ class _HomeState extends State<Home> {
                 title: const Text("Dashboard"),
                 onTap: () {
                   setState(() {
+                    routeName = "Dashboard";
                     _homeWidget = const Dashboard();
                   });
                   Navigator.pop(context);
@@ -83,6 +85,7 @@ class _HomeState extends State<Home> {
                 title: const Text("Inventory"),
                 onTap: () {
                   setState(() {
+                    routeName = "Inventory";
                     _homeWidget = const Inventory();
                   });
                   Navigator.pop(context);

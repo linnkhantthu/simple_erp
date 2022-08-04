@@ -35,44 +35,54 @@ class _InventoryState extends State<Inventory> {
       future: productsFromServer,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          return Center(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const Text("Inventory"),
-                DataTable(
-                    columns: List<DataColumn>.generate(columnNames.length,
-                        (index) => DataColumn(label: Text(columnNames[index]))),
-                    rows: List<DataRow>.generate(
-                        (snapshot.data as List<Product>).length,
-                        (index) => DataRow(cells: <DataCell>[
-                              DataCell(Text(
-                                  (snapshot.data as List<Product>)[index]
-                                      .id
-                                      .toString())),
-                              DataCell(Text(
-                                  (snapshot.data as List<Product>)[index]
-                                      .productName
-                                      .toString())),
-                              DataCell(Text(
-                                  (snapshot.data as List<Product>)[index]
-                                      .contains
-                                      .toString())),
-                              DataCell(Text(
-                                  (snapshot.data as List<Product>)[index]
-                                      .unit
-                                      .toString())),
-                              DataCell(Text(
-                                  (snapshot.data as List<Product>)[index]
-                                      .price
-                                      .toString())),
-                              DataCell(Text(
-                                  (snapshot.data as List<Product>)[index]
-                                      .qty
-                                      .toString())),
-                            ]))),
-              ],
-            ),
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              // const Text("Inventory"),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextButton(
+                  onPressed: () {},
+                  style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(Colors.green)),
+                  child: const Text(
+                    "Add Product",
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ),
+              ),
+              DataTable(
+                  columns: List<DataColumn>.generate(columnNames.length,
+                      (index) => DataColumn(label: Text(columnNames[index]))),
+                  rows: List<DataRow>.generate(
+                      (snapshot.data as List<Product>).length,
+                      (index) => DataRow(cells: <DataCell>[
+                            DataCell(Text(
+                                (snapshot.data as List<Product>)[index]
+                                    .id
+                                    .toString())),
+                            DataCell(Text(
+                                (snapshot.data as List<Product>)[index]
+                                    .productName
+                                    .toString())),
+                            DataCell(Text(
+                                (snapshot.data as List<Product>)[index]
+                                    .contains
+                                    .toString())),
+                            DataCell(Text(
+                                (snapshot.data as List<Product>)[index]
+                                    .unit
+                                    .toString())),
+                            DataCell(Text(
+                                (snapshot.data as List<Product>)[index]
+                                    .price
+                                    .toString())),
+                            DataCell(Text(
+                                (snapshot.data as List<Product>)[index]
+                                    .qty
+                                    .toString())),
+                          ]))),
+            ],
           );
         } else {
           return progressBar();
