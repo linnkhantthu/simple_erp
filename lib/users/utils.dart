@@ -92,6 +92,6 @@ Object? getCurrentUser(String key) {
   }
 }
 
-void removeCurrentUser(String key) {
-  box.remove(key);
+Future<void> removeCurrentUser(String key) async {
+  await box.remove(key);
 }

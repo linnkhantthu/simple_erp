@@ -63,7 +63,10 @@ class _HomeState extends State<Home> {
                 ),
               ),
               ListTile(
-                leading: const Icon(Icons.dashboard),
+                leading: const Icon(
+                  Icons.dashboard,
+                  color: Colors.blue,
+                ),
                 title: const Text("Dashboard"),
                 onTap: () {
                   setState(() {
@@ -73,7 +76,10 @@ class _HomeState extends State<Home> {
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.inventory),
+                leading: const Icon(
+                  Icons.inventory,
+                  color: Colors.orange,
+                ),
                 title: const Text("Inventory"),
                 onTap: () {
                   setState(() {
@@ -83,15 +89,39 @@ class _HomeState extends State<Home> {
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.logout),
+                leading: const Icon(
+                  Icons.logout,
+                  color: Colors.red,
+                ),
                 title: const Text("Logout & Exit"),
                 onTap: () {
-                  removeCurrentUser("current_user");
-                  Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(
-                          builder: (BuildContext context) => const LoginPage()),
-                      (Route<dynamic> route) => false);
-                  SystemNavigator.pop();
+                  Navigator.pop(context);
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text("Logout and Exit?"),
+                      content: const Text("Are you sure?"),
+                      actions: <Widget>[
+                        TextButton(
+                            onPressed: () {
+                              Navigator.pop(context, 'Cancel');
+                            },
+                            child: const Text(
+                              "Cancel",
+                              style: TextStyle(color: Colors.black),
+                            )),
+                        TextButton(
+                            onPressed: () {
+                              removeCurrentUser("current_user")
+                                  .whenComplete(() {
+                                Navigator.pop(context, 'Sure');
+                                SystemNavigator.pop();
+                              });
+                            },
+                            child: const Text("Sure"))
+                      ],
+                    ),
+                  );
                 },
               ),
             ],
