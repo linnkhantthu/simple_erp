@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:simple_erp/dashboard.dart';
 import 'package:simple_erp/inventory.dart';
 import 'package:simple_erp/users/Objects/ErrorMessage.dart';
@@ -42,18 +43,6 @@ class _HomeState extends State<Home> {
       return Scaffold(
         resizeToAvoidBottomInset: true,
         appBar: AppBar(
-          actions: <Widget>[
-            FlatButton(
-              onPressed: () {
-                removeCurrentUser("current_user");
-                Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(
-                        builder: (BuildContext context) => const LoginPage()),
-                    (Route<dynamic> route) => false);
-              },
-              child: const Text("Logout"),
-            ),
-          ],
           title: Text('Dashboard ${(currentUser as User).firstName}'),
         ),
         drawer: Container(
@@ -91,6 +80,18 @@ class _HomeState extends State<Home> {
                     _homeWidget = const Inventory();
                   });
                   Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.logout),
+                title: const Text("Logout & Exit"),
+                onTap: () {
+                  removeCurrentUser("current_user");
+                  Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(
+                          builder: (BuildContext context) => const LoginPage()),
+                      (Route<dynamic> route) => false);
+                  SystemNavigator.pop();
                 },
               ),
             ],

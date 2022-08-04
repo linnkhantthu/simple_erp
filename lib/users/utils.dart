@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
@@ -23,21 +24,25 @@ Future<Object> registerUser(
     'password': password,
   };
   final encoding = Encoding.getByName('utf-8');
-  final response = await http.post(
-    url,
-    headers: headers,
-    body: jsonEncode(body),
-    encoding: encoding,
-  );
-  dynamic jsonBody = jsonDecode(response.body);
-  if (response.statusCode == 200) {
-    if (jsonBody['status']) {
-      return User.fromJson(jsonBody['data']);
+  try {
+    final response = await http.post(
+      url,
+      headers: headers,
+      body: jsonEncode(body),
+      encoding: encoding,
+    );
+    dynamic jsonBody = jsonDecode(response.body);
+    if (response.statusCode == 200) {
+      if (jsonBody['status']) {
+        return User.fromJson(jsonBody['data']);
+      } else {
+        return ErrorText.fromJson(jsonBody['data']);
+      }
     } else {
-      return ErrorText.fromJson(jsonBody['data']);
+      return const ErrorText(message: "404 not Found");
     }
-  } else {
-    throw Exception("404 not Found");
+  } on SocketException catch (e) {
+    return ErrorText(message: e.message);
   }
 }
 
@@ -51,21 +56,26 @@ Future<Object> loginUser(String mail, String password) async {
     'password': password,
   };
   final encoding = Encoding.getByName('utf-8');
-  final response = await http.post(
-    url,
-    headers: headers,
-    body: jsonEncode(body),
-    encoding: encoding,
-  );
-  dynamic jsonBody = jsonDecode(response.body);
-  if (response.statusCode == 200) {
-    if (jsonBody['status']) {
-      return User.fromJson(jsonBody['data']);
+  try {
+    final response = await http.post(
+      url,
+      headers: headers,
+      body: jsonEncode(body),
+      encoding: encoding,
+    );
+    dynamic jsonBody = jsonDecode(response.body);
+    if (response.statusCode == 200) {
+      if (jsonBody['status']) {
+        return User.fromJson(jsonBody['data']);
+      } else {
+        return ErrorText.fromJson(jsonBody['data']);
+      }
     } else {
-      return ErrorText.fromJson(jsonBody['data']);
+      // throw Exception("404 not Found");
+      return const ErrorText(message: "404 not Dound");
     }
-  } else {
-    throw Exception("404 not Found");
+  } on SocketException catch (e) {
+    return ErrorText(message: e.message);
   }
 }
 
