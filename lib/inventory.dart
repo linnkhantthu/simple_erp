@@ -47,8 +47,12 @@ class _InventoryState extends State<Inventory> {
                     builder: (context) => const SizedBox(
                       width: 200,
                       height: 500,
-                      child: Dialog(
-                        child: AddProduct(),
+                      child: AlertDialog(
+                        actions: [
+                          FittedBox(
+                            child: AddProduct(),
+                          ),
+                        ],
                       ),
                     ),
                   ),

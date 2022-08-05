@@ -41,8 +41,8 @@ Future<Object> registerUser(
     } else {
       return const ErrorText(message: "404 not Found");
     }
-  } on SocketException catch (e) {
-    return ErrorText(message: e.message);
+  } catch (e) {
+    return const ErrorText(message: "Connection Refused");
   }
 }
 
@@ -74,8 +74,8 @@ Future<Object> loginUser(String mail, String password) async {
       // throw Exception("404 not Found");
       return const ErrorText(message: "404 not Dound");
     }
-  } on SocketException catch (e) {
-    return ErrorText(message: e.message);
+  } catch (e) {
+    return const ErrorText(message: "Connection Refused");
   }
 }
 

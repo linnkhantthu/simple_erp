@@ -96,6 +96,10 @@ class _RegisterPageState extends State<RegisterPage> {
                         child: TextField(
                           controller: _mail,
                           decoration: InputDecoration(
+                              prefixIcon: const Icon(
+                                Icons.mail,
+                                color: Colors.blue,
+                              ),
                               border: const OutlineInputBorder(),
                               hintText: "Gmail",
                               errorText: _mailErrorText),
@@ -125,7 +129,12 @@ class _RegisterPageState extends State<RegisterPage> {
                         padding: const EdgeInsets.all(8),
                         child: TextField(
                           controller: _password,
+                          obscureText: true,
                           decoration: InputDecoration(
+                              prefixIcon: const Icon(
+                                Icons.key,
+                                color: Colors.red,
+                              ),
                               border: const OutlineInputBorder(),
                               hintText: "Password",
                               errorText: _passwordErrorText),
@@ -135,7 +144,12 @@ class _RegisterPageState extends State<RegisterPage> {
                         padding: const EdgeInsets.all(8),
                         child: TextField(
                           controller: _confirmPassword,
+                          obscureText: true,
                           decoration: InputDecoration(
+                              prefixIcon: const Icon(
+                                Icons.key,
+                                color: Colors.red,
+                              ),
                               border: const OutlineInputBorder(),
                               hintText: "Confirm Password",
                               errorText: _confirmPasswordErrorText),

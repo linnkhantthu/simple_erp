@@ -12,6 +12,7 @@ class _AddProductState extends State<AddProduct> {
   late final TextEditingController _productName;
   var _idErrorText = null;
   var _productNameErrorText = null;
+  String dropdownValue = 'One';
 
   @override
   void initState() {
@@ -65,6 +66,48 @@ class _AddProductState extends State<AddProduct> {
                             border: const OutlineInputBorder(),
                             hintText: "Product Name",
                             errorText: _productNameErrorText),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
+              width: 400,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: SizedBox(
+                      width: 100,
+                      child: TextField(
+                        controller: _id,
+                        decoration: InputDecoration(
+                            border: const OutlineInputBorder(),
+                            hintText: "Contains",
+                            errorText: _idErrorText),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: SizedBox(
+                      width: 200,
+                      child: DropdownButton(
+                        value: dropdownValue,
+                        items: <String>['One', 'Two', 'Free', 'Four']
+                            .map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                        onChanged: (String? value) {
+                          setState(() {
+                            dropdownValue = value!;
+                          });
+                        },
                       ),
                     ),
                   ),

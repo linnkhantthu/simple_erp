@@ -94,6 +94,10 @@ class _LoginPageState extends State<LoginPage> {
                         child: TextField(
                           controller: _mail,
                           decoration: InputDecoration(
+                              prefixIcon: const Icon(
+                                Icons.mail,
+                                color: Colors.blue,
+                              ),
                               border: const OutlineInputBorder(),
                               hintText: "Gmail",
                               errorText: _mailErrorText),
@@ -103,7 +107,12 @@ class _LoginPageState extends State<LoginPage> {
                         padding: const EdgeInsets.all(8),
                         child: TextField(
                           controller: _password,
+                          obscureText: true,
                           decoration: InputDecoration(
+                              prefixIcon: const Icon(
+                                Icons.key,
+                                color: Colors.red,
+                              ),
                               border: const OutlineInputBorder(),
                               hintText: "Password",
                               errorText: _passwordErrorText),
