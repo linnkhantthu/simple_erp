@@ -5,6 +5,7 @@ import 'package:simple_erp/inventory/Objects/Product.dart';
 import 'package:simple_erp/users/Objects/ErrorMessage.dart';
 import 'package:simple_erp/users/Objects/User.dart';
 import 'package:simple_erp/users/utils.dart';
+import 'dart:async';
 
 var protocol = dotenv.env['PROTOCOL'];
 var hostname = dotenv.env['HOST_NAME'];
@@ -41,5 +42,18 @@ Future<List<Object>> fetchInventory() async {
     }
   } else {
     throw Exception("404 not Found");
+  }
+}
+
+// STEP1:  Stream setup
+class StreamSocket {
+  final _socketResponse = StreamController<String>();
+
+  void Function(String) get addResponse => _socketResponse.sink.add;
+
+  Stream<String> get getResponse => _socketResponse.stream;
+
+  void dispose() {
+    _socketResponse.close();
   }
 }
