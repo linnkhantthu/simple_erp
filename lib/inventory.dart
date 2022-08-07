@@ -14,6 +14,7 @@ class Inventory extends StatefulWidget {
 }
 
 class _InventoryState extends State<Inventory> {
+  late IO.Socket socket;
   late Future<List<Product>> products;
   late Future<Object> productsFromServer;
   List<Product> socketProducts = [];
@@ -27,39 +28,35 @@ class _InventoryState extends State<Inventory> {
     "Qty"
   ];
 
-  Future<void> connectAndListen() async {
-    IO.Socket socket = IO.io('http://localhost:5000',
+  Future<void> connectAndListen() async {}
+
+  @override
+  void initState() {
+    socket = IO.io('http://localhost:5000',
         OptionBuilder().setTransports(['websocket']).build());
-    socket.connect();
+
     socket.onConnect((_) {
-      print('Connected');
+      print('connect');
       socket.emit('msg', 'test');
     });
 
     //When an event recieved from server, data is added to the stream
-    // socket.on('event', (data) => streamSocket.getResponse);
-    socket.on('fromServer', (data) {
-      print(data);
-      setState(() {
-        streamSocket.getResponse;
-      });
-      socket.onDisconnect((_) => print('disconnect'));
-    });
-  }
 
-  @override
-  void initState() {
-    connectAndListen();
+    socket.onDisconnect((_) => print('disconnect'));
+    socket.on('getProducts', (data) {
+      streamSocket.addResponse;
+    });
     productsFromServer = fetchInventory();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    print(streamSocket.getResponse.isEmpty);
     return StreamBuilder(
       stream: streamSocket.getResponse,
       builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-        print(snapshot.hasError);
+        print(snapshot.connectionState);
         switch (snapshot.connectionState) {
           case ConnectionState.waiting:
             return progressBar();
