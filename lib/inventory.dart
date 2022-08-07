@@ -16,9 +16,6 @@ class Inventory extends StatefulWidget {
 
 class _InventoryState extends State<Inventory> {
   late IO.Socket socket;
-  // late Future<List<Product>> products;
-  // late Future<Object> productsFromServer;
-  // List<Product> socketProducts = [];
   late Object? currentUser;
   StreamSocket streamSocket = StreamSocket();
   final List columnNames = [
@@ -32,9 +29,7 @@ class _InventoryState extends State<Inventory> {
 
   @override
   void initState() {
-    currentUser = getCurrentUser('current_user');
-    // socket = IO.io('http://localhost:5000',
-    //     OptionBuilder().setTransports(['websocket']).build());
+    currentUser = getCurrentUser('current_user'); // Get current user
     socket = IO.io('http://localhost:5000', <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
@@ -43,15 +38,13 @@ class _InventoryState extends State<Inventory> {
       socket.connect();
     }
     socket.onConnect((_) {
-      print('connect');
+      print("Connected");
       socket.emit('getProducts', currentUser);
     });
 
     //When an event recieved from server, data is added to the stream
-
     socket.onDisconnect((_) {
-      print(socket.active);
-      print('disconnect');
+      print('Disconnected');
     });
     socket.on('getProducts', (data) {
       List<Product> products = [];
@@ -60,13 +53,12 @@ class _InventoryState extends State<Inventory> {
       }
       streamSocket.addResponse(products);
     });
-    // productsFromServer = fetchInventory();
     super.initState();
   }
 
   @override
   void dispose() {
-    socket.close();
+    socket.dispose();
     super.dispose();
   }
 
@@ -75,12 +67,10 @@ class _InventoryState extends State<Inventory> {
     return StreamBuilder(
       stream: streamSocket.getResponse(),
       builder: (BuildContext context, AsyncSnapshot<List<Object>> snapshot) {
-        print(snapshot.connectionState);
         switch (snapshot.connectionState) {
           case ConnectionState.waiting:
             return progressBar();
           case ConnectionState.active:
-            print(snapshot.data.runtimeType);
             return Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [

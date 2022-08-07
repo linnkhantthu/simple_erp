@@ -58,7 +58,6 @@ class StreamSocket {
 
   // Stream get getResponse => _socketResponse.stream;
   Stream<List<Object>>? getResponse() {
-    print(_socketResponse.stream.runtimeType);
     return _socketResponse.stream;
   }
 

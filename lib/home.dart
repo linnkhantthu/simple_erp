@@ -1,3 +1,6 @@
+import 'dart:html';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:simple_erp/dashboard.dart';
@@ -118,7 +121,13 @@ class _HomeState extends State<Home> {
                               removeCurrentUser("current_user")
                                   .whenComplete(() {
                                 Navigator.pop(context, 'Sure');
-                                SystemNavigator.pop();
+                                SystemChannels.platform
+                                    .invokeMethod('SystemNavigator.pop');
+                                Navigator.of(context).pushAndRemoveUntil(
+                                    MaterialPageRoute(
+                                        builder: (BuildContext context) =>
+                                            const LoginPage()),
+                                    (Route<dynamic> route) => false);
                               });
                             },
                             child: const Text("Sure"))
