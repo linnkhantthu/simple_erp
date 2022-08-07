@@ -47,11 +47,20 @@ Future<List<Object>> fetchInventory() async {
 
 // STEP1:  Stream setup
 class StreamSocket {
-  final _socketResponse = StreamController<String>();
+  final _socketResponse = StreamController<List<Object>>();
 
-  void Function(String) get addResponse => _socketResponse.sink.add;
+  // void Function(String) get addResponse => _socketResponse.sink.add;
+  void addResponse(List<Object> event) {
+    if (!_socketResponse.isClosed) {
+      _socketResponse.sink.add(event);
+    }
+  }
 
-  Stream<String> get getResponse => _socketResponse.stream;
+  // Stream get getResponse => _socketResponse.stream;
+  Stream<List<Object>>? getResponse() {
+    print(_socketResponse.stream.runtimeType);
+    return _socketResponse.stream;
+  }
 
   void dispose() {
     _socketResponse.close();

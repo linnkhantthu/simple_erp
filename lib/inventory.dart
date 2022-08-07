@@ -3,6 +3,7 @@ import 'package:simple_erp/inventory/Objects/Product.dart';
 import 'package:simple_erp/inventory/addProduct.dart';
 import 'package:simple_erp/inventory/utils.dart';
 import 'package:simple_erp/users/register_page.dart';
+import 'package:simple_erp/users/utils.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:socket_io_client/socket_io_client.dart';
 
@@ -15,9 +16,10 @@ class Inventory extends StatefulWidget {
 
 class _InventoryState extends State<Inventory> {
   late IO.Socket socket;
-  late Future<List<Product>> products;
-  late Future<Object> productsFromServer;
-  List<Product> socketProducts = [];
+  // late Future<List<Product>> products;
+  // late Future<Object> productsFromServer;
+  // List<Product> socketProducts = [];
+  late Object? currentUser;
   StreamSocket streamSocket = StreamSocket();
   final List columnNames = [
     "ID",
@@ -28,39 +30,57 @@ class _InventoryState extends State<Inventory> {
     "Qty"
   ];
 
-  Future<void> connectAndListen() async {}
-
   @override
   void initState() {
-    socket = IO.io('http://localhost:5000',
-        OptionBuilder().setTransports(['websocket']).build());
-
+    currentUser = getCurrentUser('current_user');
+    // socket = IO.io('http://localhost:5000',
+    //     OptionBuilder().setTransports(['websocket']).build());
+    socket = IO.io('http://localhost:5000', <String, dynamic>{
+      'transports': ['websocket'],
+      'autoConnect': false,
+    });
+    if (!socket.connected) {
+      socket.connect();
+    }
     socket.onConnect((_) {
       print('connect');
-      socket.emit('msg', 'test');
+      socket.emit('getProducts', currentUser);
     });
 
     //When an event recieved from server, data is added to the stream
 
-    socket.onDisconnect((_) => print('disconnect'));
-    socket.on('getProducts', (data) {
-      streamSocket.addResponse;
+    socket.onDisconnect((_) {
+      print(socket.active);
+      print('disconnect');
     });
-    productsFromServer = fetchInventory();
+    socket.on('getProducts', (data) {
+      List<Product> products = [];
+      for (var element in data['data']) {
+        products.add(Product.fromJson(element));
+      }
+      streamSocket.addResponse(products);
+    });
+    // productsFromServer = fetchInventory();
     super.initState();
   }
 
   @override
+  void dispose() {
+    socket.close();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    print(streamSocket.getResponse.isEmpty);
     return StreamBuilder(
-      stream: streamSocket.getResponse,
-      builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+      stream: streamSocket.getResponse(),
+      builder: (BuildContext context, AsyncSnapshot<List<Object>> snapshot) {
         print(snapshot.connectionState);
         switch (snapshot.connectionState) {
           case ConnectionState.waiting:
             return progressBar();
-          case ConnectionState.done:
+          case ConnectionState.active:
+            print(snapshot.data.runtimeType);
             return Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
