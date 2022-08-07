@@ -15,9 +15,8 @@ class Inventory extends StatefulWidget {
 }
 
 class _InventoryState extends State<Inventory> {
-  late IO.Socket socket;
   late Object? currentUser;
-  StreamSocket streamSocket = StreamSocket();
+  late Future<List<Object>> products;
   final List columnNames = [
     "ID",
     "Product Name",
@@ -30,67 +29,48 @@ class _InventoryState extends State<Inventory> {
   @override
   void initState() {
     currentUser = getCurrentUser('current_user'); // Get current user
-    socket = IO.io('http://localhost:5000', <String, dynamic>{
-      'transports': ['websocket'],
-      'autoConnect': false,
-    });
-    if (!socket.connected) {
-      socket.connect();
-    }
-    socket.onConnect((_) {
-      print("Connected");
-      socket.emit('getProducts', currentUser);
-    });
-
-    //When an event recieved from server, data is added to the stream
-    socket.onDisconnect((_) {
-      print('Disconnected');
-    });
-    socket.on('getProducts', (data) {
-      List<Product> products = [];
-      for (var element in data['data']) {
-        products.add(Product.fromJson(element));
-      }
-      streamSocket.addResponse(products);
-    });
     super.initState();
   }
 
   @override
   void dispose() {
-    socket.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder(
-      stream: streamSocket.getResponse(),
-      builder: (BuildContext context, AsyncSnapshot<List<Object>> snapshot) {
+    return FutureBuilder(
+      future: fetchInventory(),
+      builder: (BuildContext context, snapshot) {
+        // print("Connection state: ${snapshot.connectionState}");
         switch (snapshot.connectionState) {
           case ConnectionState.waiting:
             return progressBar();
-          case ConnectionState.active:
+          case ConnectionState.done:
             return Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TextButton(
-                    onPressed: () => showDialog(
-                      context: context,
-                      builder: (context) => const SizedBox(
-                        width: 200,
-                        height: 500,
-                        child: AlertDialog(
-                          actions: [
-                            FittedBox(
-                              child: AddProduct(),
-                            ),
-                          ],
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => const SizedBox(
+                          width: 200,
+                          height: 500,
+                          child: AlertDialog(
+                            actions: [
+                              FittedBox(
+                                child: AddProduct(
+                                  units: [],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ),
+                      );
+                    },
                     style: ButtonStyle(
                         backgroundColor:
                             MaterialStateProperty.all(Colors.green)),

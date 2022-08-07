@@ -29,39 +29,18 @@ Future<List<Object>> fetchInventory() async {
     encoding: encoding,
   );
   dynamic jsonBody = jsonDecode(response.body);
-
   if (response.statusCode == 200) {
     if (jsonBody['status']) {
       List<Product> products = [];
       for (var element in jsonBody['data']) {
         products.add(Product.fromJson(element));
       }
+
       return products;
     } else {
       return [ErrorText.fromJson(jsonBody['data'])];
     }
   } else {
     throw Exception("404 not Found");
-  }
-}
-
-// STEP1:  Stream setup
-class StreamSocket {
-  final _socketResponse = StreamController<List<Object>>();
-
-  // void Function(String) get addResponse => _socketResponse.sink.add;
-  void addResponse(List<Object> event) {
-    if (!_socketResponse.isClosed) {
-      _socketResponse.sink.add(event);
-    }
-  }
-
-  // Stream get getResponse => _socketResponse.stream;
-  Stream<List<Object>>? getResponse() {
-    return _socketResponse.stream;
-  }
-
-  void dispose() {
-    _socketResponse.close();
   }
 }

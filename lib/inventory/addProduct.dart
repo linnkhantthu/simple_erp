@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:socket_io_client/socket_io_client.dart';
 
 class AddProduct extends StatefulWidget {
-  const AddProduct({Key? key}) : super(key: key);
+  const AddProduct({Key? key, required this.units}) : super(key: key);
+  final List units;
 
   @override
   State<AddProduct> createState() => _AddProductState();
@@ -12,8 +15,10 @@ class _AddProductState extends State<AddProduct> {
   late final TextEditingController _id;
   late final TextEditingController _productName;
   late final TextEditingController _contains;
-  late final String _unit;
+  late final List _unit;
   late final TextEditingController _price;
+  late IO.Socket socket;
+  late List units;
 
   var _idErrorText = null;
   var _productNameErrorText = null;
@@ -22,11 +27,18 @@ class _AddProductState extends State<AddProduct> {
 
   @override
   void initState() {
+    socket = IO.io('http://localhost:5000', <String, dynamic>{
+      'transports': ['websocket'],
+      'autoConnect': false,
+    });
+
     _id = TextEditingController();
     _productName = TextEditingController();
     _contains = TextEditingController();
     _price = TextEditingController();
-    _unit = "PCS";
+    setState(() {
+      _unit = widget.units;
+    });
     super.initState();
   }
 
@@ -106,15 +118,15 @@ class _AddProductState extends State<AddProduct> {
                 Padding(
                   padding: const EdgeInsets.all(8),
                   child: DropdownButton(
-                    value: _unit,
-                    items: <String>['PCS', 'KG', 'G', 'Feet']
-                        .map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
+                    value: _unit[0],
+                    items:
+                        _unit.map<DropdownMenuItem<dynamic>>((dynamic value) {
+                      return DropdownMenuItem<dynamic>(
                         value: value,
                         child: Text(value),
                       );
                     }).toList(),
-                    onChanged: (String? value) {
+                    onChanged: (dynamic value) {
                       setState(() {
                         _unit = value!;
                       });
