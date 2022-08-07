@@ -50,35 +50,43 @@ class _InventoryState extends State<Inventory> {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TextButton(
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) => const SizedBox(
-                          width: 200,
-                          height: 500,
-                          child: AlertDialog(
-                            actions: [
-                              FittedBox(
-                                child: AddProduct(
-                                  units: [],
-                                ),
+                Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextButton(
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) => const SizedBox(
+                              width: 200,
+                              height: 500,
+                              child: AlertDialog(
+                                actions: [
+                                  FittedBox(
+                                    child: AddProduct(),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
+                            ),
+                          );
+                        },
+                        style: ButtonStyle(
+                            backgroundColor:
+                                MaterialStateProperty.all(Colors.green)),
+                        child: const Text(
+                          "Add Product",
+                          style: TextStyle(color: Colors.black),
                         ),
-                      );
-                    },
-                    style: ButtonStyle(
-                        backgroundColor:
-                            MaterialStateProperty.all(Colors.green)),
-                    child: const Text(
-                      "Add Product",
-                      style: TextStyle(color: Colors.black),
+                      ),
                     ),
-                  ),
+                    InkWell(
+                      onTap: () {
+                        setState(() {});
+                      },
+                      child: const Icon(Icons.refresh),
+                    )
+                  ],
                 ),
                 DataTable(
                     columns: List<DataColumn>.generate(columnNames.length,
