@@ -66,8 +66,44 @@ Future<Object> fetchUnits() async {
   dynamic jsonBody = jsonDecode(response.body);
   if (response.statusCode == 200) {
     if (jsonBody['status']) {
-      print(jsonBody['data'].runtimeType);
       return Units(units: jsonBody['data']);
+    } else {
+      return ErrorText.fromJson(jsonBody['data']);
+    }
+  } else {
+    throw Exception("404 not Found");
+  }
+}
+
+Future<Object> addProduct(
+    int id, int contains, double price, String productName, String unit) async {
+  var currentUser = getCurrentUser('current_user');
+  var mail = (currentUser as User).mail;
+  final url = Uri.parse("$protocol://$hostname/inventory");
+  final headers = {
+    "Content-Type": "application/json",
+  };
+  Map<String, dynamic> body = {
+    'mail': mail,
+    'product': {
+      'id': id,
+      'contains': contains,
+      'price': price,
+      'productName': productName,
+      'unit': unit,
+    }
+  };
+  final encoding = Encoding.getByName('utf-8');
+  final response = await http.post(
+    url,
+    headers: headers,
+    body: jsonEncode(body),
+    encoding: encoding,
+  );
+  dynamic jsonBody = jsonDecode(response.body);
+  if (response.statusCode == 200) {
+    if (jsonBody['status']) {
+      return Product.fromJson(jsonBody['data']);
     } else {
       return ErrorText.fromJson(jsonBody['data']);
     }

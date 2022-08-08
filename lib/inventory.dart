@@ -4,8 +4,6 @@ import 'package:simple_erp/inventory/addProduct.dart';
 import 'package:simple_erp/inventory/utils.dart';
 import 'package:simple_erp/users/register_page.dart';
 import 'package:simple_erp/users/utils.dart';
-import 'package:socket_io_client/socket_io_client.dart' as IO;
-import 'package:socket_io_client/socket_io_client.dart';
 
 class Inventory extends StatefulWidget {
   const Inventory({Key? key}) : super(key: key);
@@ -42,85 +40,100 @@ class _InventoryState extends State<Inventory> {
     return FutureBuilder(
       future: fetchInventory(),
       builder: (BuildContext context, snapshot) {
-        // print("Connection state: ${snapshot.connectionState}");
         switch (snapshot.connectionState) {
           case ConnectionState.waiting:
             return progressBar();
           case ConnectionState.done:
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Row(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: TextButton(
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (context) => const SizedBox(
-                              width: 200,
-                              height: 500,
-                              child: AlertDialog(
-                                actions: [
-                                  FittedBox(
-                                    child: AddProduct(),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                        style: ButtonStyle(
-                            backgroundColor:
-                                MaterialStateProperty.all(Colors.green)),
-                        child: const Text(
-                          "Add Product",
-                          style: TextStyle(color: Colors.black),
-                        ),
-                      ),
+            if (snapshot.hasError) {
+              return Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Icon(
+                      Icons.warning,
+                      color: Colors.red,
                     ),
-                    InkWell(
-                      onTap: () {
-                        setState(() {});
-                      },
-                      child: const Icon(Icons.refresh),
-                    )
+                    Text("No internet connection to server"),
                   ],
                 ),
-                DataTable(
-                    columns: List<DataColumn>.generate(columnNames.length,
-                        (index) => DataColumn(label: Text(columnNames[index]))),
-                    rows: List<DataRow>.generate(
-                        (snapshot.data as List<Product>).length,
-                        (index) => DataRow(cells: <DataCell>[
-                              DataCell(Text(
-                                  (snapshot.data as List<Product>)[index]
-                                      .id
-                                      .toString())),
-                              DataCell(Text(
-                                  (snapshot.data as List<Product>)[index]
-                                      .productName
-                                      .toString())),
-                              DataCell(Text(
-                                  (snapshot.data as List<Product>)[index]
-                                      .contains
-                                      .toString())),
-                              DataCell(Text(
-                                  (snapshot.data as List<Product>)[index]
-                                      .unit
-                                      .toString())),
-                              DataCell(Text(
-                                  (snapshot.data as List<Product>)[index]
-                                      .price
-                                      .toString())),
-                              DataCell(Text(
-                                  (snapshot.data as List<Product>)[index]
-                                      .qty
-                                      .toString())),
-                            ]))),
-              ],
-            );
+              );
+            } else {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextButton(
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) => const SizedBox(
+                                width: 200,
+                                height: 500,
+                                child: AlertDialog(
+                                  actions: [
+                                    AddProduct(),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                          style: ButtonStyle(
+                              backgroundColor:
+                                  MaterialStateProperty.all(Colors.green)),
+                          child: const Text(
+                            "Add Product",
+                            style: TextStyle(color: Colors.black),
+                          ),
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () {
+                          setState(() {});
+                        },
+                        child: const Icon(Icons.refresh),
+                      )
+                    ],
+                  ),
+                  DataTable(
+                      columns: List<DataColumn>.generate(
+                          columnNames.length,
+                          (index) =>
+                              DataColumn(label: Text(columnNames[index]))),
+                      rows: List<DataRow>.generate(
+                          (snapshot.data as List<Product>).length,
+                          (index) => DataRow(cells: <DataCell>[
+                                DataCell(Text(
+                                    (snapshot.data as List<Product>)[index]
+                                        .id
+                                        .toString())),
+                                DataCell(Text(
+                                    (snapshot.data as List<Product>)[index]
+                                        .productName
+                                        .toString())),
+                                DataCell(Text(
+                                    (snapshot.data as List<Product>)[index]
+                                        .contains
+                                        .toString())),
+                                DataCell(Text(
+                                    (snapshot.data as List<Product>)[index]
+                                        .unit
+                                        .toString())),
+                                DataCell(Text(
+                                    (snapshot.data as List<Product>)[index]
+                                        .price
+                                        .toString())),
+                                DataCell(Text(
+                                    (snapshot.data as List<Product>)[index]
+                                        .qty
+                                        .toString())),
+                              ]))),
+                ],
+              );
+            }
+
           default:
             return progressBar();
         }

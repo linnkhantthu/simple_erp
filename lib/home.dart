@@ -136,21 +136,7 @@ class _HomeState extends State<Home> {
             ],
           ),
         ),
-        body: Center(
-          child: FittedBox(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SingleChildScrollView(
-                  child: SizedBox(
-                    width: 800,
-                    child: FittedBox(child: _homeWidget),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+        body: _homeWidget,
       );
     }
   }
