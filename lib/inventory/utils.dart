@@ -79,7 +79,7 @@ Future<Object> addProduct(
     int id, int contains, double price, String productName, String unit) async {
   var currentUser = getCurrentUser('current_user');
   var mail = (currentUser as User).mail;
-  final url = Uri.parse("$protocol://$hostname/inventory");
+  final url = Uri.parse("$protocol://$hostname/addProduct");
   final headers = {
     "Content-Type": "application/json",
   };
@@ -93,6 +93,7 @@ Future<Object> addProduct(
       'unit': unit,
     }
   };
+  print("Data sent: $body");
   final encoding = Encoding.getByName('utf-8');
   final response = await http.post(
     url,

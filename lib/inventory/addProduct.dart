@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:simple_erp/inventory/Objects/Product.dart';
 import 'package:simple_erp/inventory/Objects/Units.dart';
 import 'package:simple_erp/inventory/utils.dart';
+import 'package:simple_erp/users/Objects/ErrorMessage.dart';
 import 'package:simple_erp/users/register_page.dart';
 
 class AddProduct extends StatefulWidget {
@@ -90,7 +92,7 @@ class _AddProductState extends State<AddProduct> {
                               child: Padding(
                                 padding: const EdgeInsets.all(8),
                                 child: TextField(
-                                  enabled: false,
+                                  // enabled: false,
                                   controller: _id,
                                   decoration: InputDecoration(
                                       border: const OutlineInputBorder(),
@@ -201,13 +203,25 @@ class _AddProductState extends State<AddProduct> {
                                     _containsErrorText != null ||
                                     _productNameErrorText != null) {
                                 } else {
-                                  addProduct(
-                                          int.parse(_id.text),
-                                          int.parse(_contains.text),
-                                          double.parse(_price.text),
-                                          _productName.text,
-                                          dropDownValue)
-                                      .then((value) => print("Product Added"));
+                                  try {
+                                    addProduct(
+                                            int.parse(_id.text),
+                                            int.parse(_contains.text),
+                                            double.parse(_price.text),
+                                            _productName.text,
+                                            dropDownValue)
+                                        .then((value) {
+                                      if (value is Product) {
+                                        print(
+                                            "Added Product: ${(value).productName}");
+                                      } else {
+                                        _idErrorText =
+                                            (value as ErrorText).message;
+                                      }
+                                    });
+                                  } catch (e) {
+                                    print(e);
+                                  }
                                 }
                               },
                               style: ButtonStyle(
