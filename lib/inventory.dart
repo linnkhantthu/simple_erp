@@ -59,7 +59,8 @@ class _InventoryState extends State<Inventory> {
                 ),
               );
             } else {
-              return Center(
+              return Align(
+                alignment: Alignment.topCenter,
                 child: SizedBox(
                   width: 1000,
                   child: FittedBox(
