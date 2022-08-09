@@ -214,6 +214,8 @@ class _AddProductState extends State<AddProduct> {
                                       if (value is Product) {
                                         print(
                                             "Added Product: ${(value).productName}");
+                                        setState(() {});
+                                        Navigator.pop(context);
                                       } else {
                                         _idErrorText =
                                             (value as ErrorText).message;

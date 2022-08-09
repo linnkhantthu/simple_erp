@@ -47,6 +47,7 @@ class _InventoryState extends State<Inventory> {
             if (snapshot.hasError) {
               return Center(
                 child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
                     Icon(
@@ -58,79 +59,87 @@ class _InventoryState extends State<Inventory> {
                 ),
               );
             } else {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Row(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: TextButton(
-                          onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) => const SizedBox(
-                                width: 200,
-                                height: 500,
-                                child: AlertDialog(
-                                  actions: [
-                                    AddProduct(),
-                                  ],
+              return Center(
+                child: SizedBox(
+                  width: 1000,
+                  child: FittedBox(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: TextButton(
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => const SizedBox(
+                                      width: 200,
+                                      height: 500,
+                                      child: AlertDialog(
+                                        actions: [
+                                          AddProduct(),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                                style: ButtonStyle(
+                                    backgroundColor: MaterialStateProperty.all(
+                                        Colors.green)),
+                                child: const Text(
+                                  "Add Product",
+                                  style: TextStyle(color: Colors.black),
                                 ),
                               ),
-                            );
-                          },
-                          style: ButtonStyle(
-                              backgroundColor:
-                                  MaterialStateProperty.all(Colors.green)),
-                          child: const Text(
-                            "Add Product",
-                            style: TextStyle(color: Colors.black),
-                          ),
+                            ),
+                            InkWell(
+                              onTap: () {
+                                setState(() {});
+                              },
+                              child: const Icon(Icons.refresh),
+                            )
+                          ],
                         ),
-                      ),
-                      InkWell(
-                        onTap: () {
-                          setState(() {});
-                        },
-                        child: const Icon(Icons.refresh),
-                      )
-                    ],
+                        DataTable(
+                            columns: List<DataColumn>.generate(
+                                columnNames.length,
+                                (index) => DataColumn(
+                                    label: Text(columnNames[index]))),
+                            rows: List<DataRow>.generate(
+                                (snapshot.data as List<Product>).length,
+                                (index) => DataRow(cells: <DataCell>[
+                                      DataCell(Text((snapshot.data
+                                              as List<Product>)[index]
+                                          .id
+                                          .toString())),
+                                      DataCell(Text((snapshot.data
+                                              as List<Product>)[index]
+                                          .productName
+                                          .toString())),
+                                      DataCell(Text((snapshot.data
+                                              as List<Product>)[index]
+                                          .contains
+                                          .toString())),
+                                      DataCell(Text((snapshot.data
+                                              as List<Product>)[index]
+                                          .unit
+                                          .toString())),
+                                      DataCell(Text((snapshot.data
+                                              as List<Product>)[index]
+                                          .price
+                                          .toString())),
+                                      DataCell(Text((snapshot.data
+                                              as List<Product>)[index]
+                                          .qty
+                                          .toString())),
+                                    ]))),
+                      ],
+                    ),
                   ),
-                  DataTable(
-                      columns: List<DataColumn>.generate(
-                          columnNames.length,
-                          (index) =>
-                              DataColumn(label: Text(columnNames[index]))),
-                      rows: List<DataRow>.generate(
-                          (snapshot.data as List<Product>).length,
-                          (index) => DataRow(cells: <DataCell>[
-                                DataCell(Text(
-                                    (snapshot.data as List<Product>)[index]
-                                        .id
-                                        .toString())),
-                                DataCell(Text(
-                                    (snapshot.data as List<Product>)[index]
-                                        .productName
-                                        .toString())),
-                                DataCell(Text(
-                                    (snapshot.data as List<Product>)[index]
-                                        .contains
-                                        .toString())),
-                                DataCell(Text(
-                                    (snapshot.data as List<Product>)[index]
-                                        .unit
-                                        .toString())),
-                                DataCell(Text(
-                                    (snapshot.data as List<Product>)[index]
-                                        .price
-                                        .toString())),
-                                DataCell(Text(
-                                    (snapshot.data as List<Product>)[index]
-                                        .qty
-                                        .toString())),
-                              ]))),
-                ],
+                ),
               );
             }
 
