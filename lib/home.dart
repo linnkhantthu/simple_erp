@@ -1,3 +1,6 @@
+import 'dart:html';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:simple_erp/dashboard.dart';
@@ -136,7 +139,11 @@ class _HomeState extends State<Home> {
             ],
           ),
         ),
-        body: _homeWidget,
+        body: Center(
+          child: SingleChildScrollView(
+            child: FittedBox(child: _homeWidget),
+          ),
+        ),
       );
     }
   }

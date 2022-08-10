@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:simple_erp/inventory/Objects/Product.dart';
-import 'package:simple_erp/inventory/Objects/Units.dart';
 import 'package:simple_erp/users/Objects/ErrorMessage.dart';
 import 'package:simple_erp/users/Objects/User.dart';
 import 'package:simple_erp/users/utils.dart';
@@ -30,13 +29,13 @@ Future<List<Object>> fetchInventory() async {
     encoding: encoding,
   );
   dynamic jsonBody = jsonDecode(response.body);
+
   if (response.statusCode == 200) {
     if (jsonBody['status']) {
       List<Product> products = [];
       for (var element in jsonBody['data']) {
         products.add(Product.fromJson(element));
       }
-
       return products;
     } else {
       return [ErrorText.fromJson(jsonBody['data'])];
@@ -46,69 +45,23 @@ Future<List<Object>> fetchInventory() async {
   }
 }
 
-Future<Object> fetchUnits() async {
-  var currentUser = getCurrentUser('current_user');
-  var mail = (currentUser as User).mail;
-  Map<String, dynamic> body = {
-    'mail': mail,
-  };
-  final url = Uri.parse("$protocol://$hostname/getUnits");
-  final headers = {
-    "Content-Type": "application/json",
-  };
-  final encoding = Encoding.getByName('utf-8');
-  final response = await http.post(
-    url,
-    headers: headers,
-    body: jsonEncode(body),
-    encoding: encoding,
-  );
-  dynamic jsonBody = jsonDecode(response.body);
-  if (response.statusCode == 200) {
-    if (jsonBody['status']) {
-      return Units(units: jsonBody['data']);
-    } else {
-      return ErrorText.fromJson(jsonBody['data']);
-    }
-  } else {
-    throw Exception("404 not Found");
-  }
-}
+// STEP1:  Stream setup
+class StreamSocket {
+  final _socketResponse = StreamController<List<Object>>();
 
-Future<Object> addProduct(
-    int id, int contains, double price, String productName, String unit) async {
-  var currentUser = getCurrentUser('current_user');
-  var mail = (currentUser as User).mail;
-  final url = Uri.parse("$protocol://$hostname/addProduct");
-  final headers = {
-    "Content-Type": "application/json",
-  };
-  Map<String, dynamic> body = {
-    'mail': mail,
-    'product': {
-      'id': id,
-      'contains': contains,
-      'price': price,
-      'productName': productName,
-      'unit': unit,
+  // void Function(String) get addResponse => _socketResponse.sink.add;
+  void addResponse(List<Object> event) {
+    if (!_socketResponse.isClosed) {
+      _socketResponse.sink.add(event);
     }
-  };
-  print("Data sent: $body");
-  final encoding = Encoding.getByName('utf-8');
-  final response = await http.post(
-    url,
-    headers: headers,
-    body: jsonEncode(body),
-    encoding: encoding,
-  );
-  dynamic jsonBody = jsonDecode(response.body);
-  if (response.statusCode == 200) {
-    if (jsonBody['status']) {
-      return Product.fromJson(jsonBody['data']);
-    } else {
-      return ErrorText.fromJson(jsonBody['data']);
-    }
-  } else {
-    throw Exception("404 not Found");
+  }
+
+  // Stream get getResponse => _socketResponse.stream;
+  Stream<List<Object>>? getResponse() {
+    return _socketResponse.stream;
+  }
+
+  void dispose() {
+    _socketResponse.close();
   }
 }
