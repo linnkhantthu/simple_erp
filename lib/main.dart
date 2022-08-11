@@ -10,6 +10,7 @@ import 'package:simple_erp/users/utils.dart';
 Future<void> main() async {
   await dotenv.load(fileName: ".env");
   await GetStorage.init();
+
   runApp(const MyApp());
 }
 

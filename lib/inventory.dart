@@ -24,6 +24,8 @@ class _InventoryState extends State<Inventory> {
   late final TextEditingController _price;
   List<Product> products = [];
   var product;
+  var errorCode;
+  String status = "Disconnected";
 
   var _idErrorText = null;
   var _productNameErrorText = null;
@@ -45,7 +47,8 @@ class _InventoryState extends State<Inventory> {
     "Qty"
   ];
 
-  void addProduct() {
+  void addProduct(
+      BuildContext context, void Function(void Function()) setState) {
     socket.emit('addProduct', {
       "mail": (currentUser as User).mail,
       "id": _id.text,
@@ -54,14 +57,31 @@ class _InventoryState extends State<Inventory> {
       "unit": _unit,
       "price": _price.text
     });
-    print("Products in Products List: $products");
+
     socket.on('addProduct', (data) {
-      print("Data from 'addProduct'");
       product = data['data'];
+      errorCode = data['errorCode'];
     });
     Future.delayed(const Duration(seconds: 1), (() {
-      products.add(Product.fromJson(product));
-      streamSocket.addResponse(products);
+      switch (errorCode) {
+        case "PASS":
+          products.add(Product.fromJson(product));
+          streamSocket.addResponse(products);
+          Navigator.pop(context);
+          break;
+        case "SQL-ERROR":
+          setState(() {
+            _idErrorText = product;
+          });
+          break;
+        case "ID-ERROR":
+          setState(() {
+            _idErrorText = product;
+          });
+          break;
+        default:
+          break;
+      }
     }));
   }
 
@@ -71,16 +91,20 @@ class _InventoryState extends State<Inventory> {
       socket.connect();
     }
     socket.onConnect((_) {
-      print("Connected");
+      setState(() {
+        status = "Connected";
+      });
+
       socket.emit('getProducts', currentUser);
     });
 
     //When an event recieved from server, data is added to the stream
     socket.onDisconnect((_) {
-      print('Disconnected');
+      setState(() {
+        status = "Disconnected";
+      });
     });
     socket.on('getProducts', (data) {
-      print("Data from 'getProducts'");
       _units = List<String>.from(data['units']);
       _unit = _units[0];
       // List<Product> products = [];
@@ -126,209 +150,238 @@ class _InventoryState extends State<Inventory> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: TextButton(
-                            onPressed: () {
-                              showDialog(
-                                context: context,
-                                builder: (context) => SizedBox(
-                                  width: 200,
-                                  height: 500,
-                                  child: StatefulBuilder(
-                                    builder: (BuildContext context,
-                                        void Function(void Function())
-                                            setState) {
-                                      return AlertDialog(
-                                        actions: [
-                                          FittedBox(
-                                            child: Center(
-                                              child: SizedBox(
-                                                width: 400,
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.end,
-                                                  children: [
-                                                    const Padding(
-                                                      padding:
-                                                          EdgeInsets.all(8),
-                                                      child: Text(
-                                                        "Add Product",
-                                                        style: TextStyle(
-                                                          fontSize: 20,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .start,
+                        Row(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: TextButton(
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => SizedBox(
+                                      width: 200,
+                                      height: 500,
+                                      child: StatefulBuilder(
+                                        builder: (BuildContext context,
+                                            void Function(void Function())
+                                                setState) {
+                                          return AlertDialog(
+                                            actions: [
+                                              FittedBox(
+                                                child: Center(
+                                                  child: SizedBox(
+                                                    width: 400,
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .end,
                                                       children: [
-                                                        Flexible(
-                                                          child: Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .all(8),
-                                                            child: TextField(
-                                                              // enabled: false,
-                                                              controller: _id,
-                                                              decoration: InputDecoration(
-                                                                  border:
-                                                                      const OutlineInputBorder(),
-                                                                  hintText:
-                                                                      "ID",
-                                                                  errorText:
-                                                                      _idErrorText),
+                                                        const Padding(
+                                                          padding:
+                                                              EdgeInsets.all(8),
+                                                          child: Text(
+                                                            "Add Product",
+                                                            style: TextStyle(
+                                                              fontSize: 20,
                                                             ),
                                                           ),
                                                         ),
-                                                        Flexible(
-                                                          child: Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .all(8),
-                                                            child: TextField(
-                                                              controller:
-                                                                  _productName,
-                                                              decoration: InputDecoration(
-                                                                  border:
-                                                                      const OutlineInputBorder(),
-                                                                  hintText:
-                                                                      "Product Name",
-                                                                  errorText:
-                                                                      _productNameErrorText),
+                                                        Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Flexible(
+                                                              child: Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .all(8),
+                                                                child:
+                                                                    TextField(
+                                                                  // enabled: false,
+                                                                  controller:
+                                                                      _id,
+                                                                  keyboardType:
+                                                                      TextInputType
+                                                                          .number,
+                                                                  inputFormatters: [
+                                                                    FilteringTextInputFormatter
+                                                                        .digitsOnly
+                                                                  ],
+                                                                  decoration: InputDecoration(
+                                                                      border:
+                                                                          const OutlineInputBorder(),
+                                                                      hintText:
+                                                                          "ID",
+                                                                      errorText:
+                                                                          _idErrorText),
+                                                                ),
+                                                              ),
                                                             ),
-                                                          ),
+                                                            Flexible(
+                                                              child: Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .all(8),
+                                                                child:
+                                                                    TextField(
+                                                                  controller:
+                                                                      _productName,
+                                                                  decoration: InputDecoration(
+                                                                      border:
+                                                                          const OutlineInputBorder(),
+                                                                      hintText:
+                                                                          "Product Name",
+                                                                      errorText:
+                                                                          _productNameErrorText),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
                                                         ),
-                                                      ],
-                                                    ),
-                                                    Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Flexible(
-                                                          child: Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .all(8),
-                                                            child: TextField(
-                                                              keyboardType:
-                                                                  TextInputType
-                                                                      .number,
-                                                              inputFormatters: [
-                                                                FilteringTextInputFormatter
-                                                                    .digitsOnly
-                                                              ],
-                                                              controller:
-                                                                  _contains,
-                                                              decoration: InputDecoration(
-                                                                  border:
-                                                                      const OutlineInputBorder(),
-                                                                  hintText:
-                                                                      "Contains",
-                                                                  errorText:
-                                                                      _containsErrorText),
+                                                        Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Flexible(
+                                                              child: Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .all(8),
+                                                                child:
+                                                                    TextField(
+                                                                  keyboardType:
+                                                                      TextInputType
+                                                                          .number,
+                                                                  inputFormatters: [
+                                                                    FilteringTextInputFormatter
+                                                                        .digitsOnly
+                                                                  ],
+                                                                  controller:
+                                                                      _contains,
+                                                                  decoration: InputDecoration(
+                                                                      border:
+                                                                          const OutlineInputBorder(),
+                                                                      hintText:
+                                                                          "Contains",
+                                                                      errorText:
+                                                                          _containsErrorText),
+                                                                ),
+                                                              ),
                                                             ),
-                                                          ),
+                                                            Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .all(8),
+                                                              child:
+                                                                  DropdownButton(
+                                                                value: _unit,
+                                                                onChanged: (String?
+                                                                    newValue) {
+                                                                  setState(() {
+                                                                    _unit =
+                                                                        newValue!;
+                                                                  });
+                                                                },
+                                                                items: _units.map<
+                                                                    DropdownMenuItem<
+                                                                        String>>((String
+                                                                    value) {
+                                                                  return DropdownMenuItem<
+                                                                      String>(
+                                                                    value:
+                                                                        value,
+                                                                    child: Text(
+                                                                        value),
+                                                                  );
+                                                                }).toList(),
+                                                              ),
+                                                            ),
+                                                            Flexible(
+                                                              child: Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .all(8),
+                                                                child:
+                                                                    TextField(
+                                                                  keyboardType:
+                                                                      TextInputType
+                                                                          .number,
+                                                                  inputFormatters: [
+                                                                    FilteringTextInputFormatter
+                                                                        .allow(
+                                                                      RegExp(
+                                                                          r'(^\d*\.?\d*)'),
+                                                                    ),
+                                                                  ],
+                                                                  controller:
+                                                                      _price,
+                                                                  decoration: InputDecoration(
+                                                                      border:
+                                                                          const OutlineInputBorder(),
+                                                                      hintText:
+                                                                          "Price",
+                                                                      errorText:
+                                                                          _priceErrorText),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
                                                         ),
                                                         Padding(
                                                           padding:
                                                               const EdgeInsets
-                                                                  .all(8),
-                                                          child: DropdownButton(
-                                                            value: _unit,
-                                                            onChanged: (String?
-                                                                newValue) {
-                                                              setState(() {
-                                                                _unit =
-                                                                    newValue!;
-                                                              });
-                                                            },
-                                                            items: _units.map<
-                                                                DropdownMenuItem<
-                                                                    String>>((String
-                                                                value) {
-                                                              return DropdownMenuItem<
-                                                                  String>(
-                                                                value: value,
-                                                                child:
-                                                                    Text(value),
-                                                              );
-                                                            }).toList(),
-                                                          ),
-                                                        ),
-                                                        Flexible(
-                                                          child: Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .all(8),
-                                                            child: TextField(
-                                                              keyboardType:
-                                                                  TextInputType
-                                                                      .number,
-                                                              inputFormatters: [
-                                                                FilteringTextInputFormatter
-                                                                    .allow(
-                                                                  RegExp(
-                                                                      r'(^\d*\.?\d*)'),
-                                                                ),
-                                                              ],
-                                                              controller:
-                                                                  _price,
-                                                              decoration: InputDecoration(
-                                                                  border:
-                                                                      const OutlineInputBorder(),
-                                                                  hintText:
-                                                                      "Price",
-                                                                  errorText:
-                                                                      _priceErrorText),
-                                                            ),
-                                                          ),
-                                                        ),
+                                                                  .all(8.0),
+                                                          child: TextButton(
+                                                              onPressed: () {
+                                                                addProduct(
+                                                                    context,
+                                                                    setState);
+                                                              },
+                                                              style: ButtonStyle(
+                                                                  backgroundColor:
+                                                                      MaterialStateProperty.all(
+                                                                          Colors
+                                                                              .green)),
+                                                              child: const Text(
+                                                                "Add",
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .black),
+                                                              )),
+                                                        )
                                                       ],
                                                     ),
-                                                    Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              8.0),
-                                                      child: TextButton(
-                                                          onPressed: () {
-                                                            print("Pressed");
-                                                            addProduct();
-                                                          },
-                                                          style: ButtonStyle(
-                                                              backgroundColor:
-                                                                  MaterialStateProperty
-                                                                      .all(Colors
-                                                                          .green)),
-                                                          child: const Text(
-                                                            "Add",
-                                                            style: TextStyle(
-                                                                color: Colors
-                                                                    .black),
-                                                          )),
-                                                    )
-                                                  ],
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  ),
+                                            ],
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  );
+                                },
+                                style: ButtonStyle(
+                                    backgroundColor: MaterialStateProperty.all(
+                                        Colors.green)),
+                                child: const Text(
+                                  "Add Product",
+                                  style: TextStyle(color: Colors.black),
                                 ),
-                              );
-                            },
-                            style: ButtonStyle(
-                                backgroundColor:
-                                    MaterialStateProperty.all(Colors.green)),
-                            child: const Text(
-                              "Add Product",
-                              style: TextStyle(color: Colors.black),
+                              ),
                             ),
-                          ),
+                            Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: Text(
+                                "Status:  $status",
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                         DataTable(
                             columns: List<DataColumn>.generate(
