@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:simple_erp/inventory/Objects/Product.dart';
@@ -64,4 +65,15 @@ class StreamSocket {
   void dispose() {
     _socketResponse.close();
   }
+}
+
+void resetAddProductForm(
+    TextEditingController _id,
+    TextEditingController _productName,
+    TextEditingController _contains,
+    TextEditingController _price) {
+  _id.clear();
+  _productName.clear();
+  _contains.clear();
+  _price.clear();
 }

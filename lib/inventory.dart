@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:simple_erp/inventory/Objects/Product.dart';
 import 'package:flutter/services.dart';
 import 'package:simple_erp/inventory/utils.dart';
@@ -16,6 +17,10 @@ class Inventory extends StatefulWidget {
 }
 
 class _InventoryState extends State<Inventory> {
+  var protocol = dotenv.env['PROTOCOL'];
+  var hostname = dotenv.env['HOST_NAME'];
+  final EdgeInsets padding = const EdgeInsets.all(8);
+  final TextStyle dataTableStyle = const TextStyle(fontSize: 30);
   late final TextEditingController _id;
   late final TextEditingController _productName;
   late final TextEditingController _contains;
@@ -26,13 +31,14 @@ class _InventoryState extends State<Inventory> {
   var product;
   var errorCode;
   String status = "Disconnected";
+  bool isDisposed = false;
 
   var _idErrorText = null;
   var _productNameErrorText = null;
   var _containsErrorText = null;
   var _priceErrorText = null;
 
-  IO.Socket socket = IO.io('http://localhost:5000', <String, dynamic>{
+  IO.Socket socket = IO.io('http://192.168.100.13:5000', <String, dynamic>{
     'transports': ['websocket'],
     'autoConnect': false,
   });
@@ -49,14 +55,16 @@ class _InventoryState extends State<Inventory> {
 
   void addProduct(
       BuildContext context, void Function(void Function()) setState) {
-    socket.emit('addProduct', {
+    var the_data = {
       "mail": (currentUser as User).mail,
       "id": _id.text,
       "productName": _productName.text,
       "contains": _contains.text,
       "unit": _unit,
       "price": _price.text
-    });
+    };
+
+    socket.emit('addProduct', the_data);
 
     socket.on('addProduct', (data) {
       product = data['data'];
@@ -67,6 +75,14 @@ class _InventoryState extends State<Inventory> {
         case "PASS":
           products.add(Product.fromJson(product));
           streamSocket.addResponse(products);
+          _id.clear();
+          _productName.clear();
+          _contains.clear();
+          _price.clear();
+          _idErrorText = null;
+          _productNameErrorText = null;
+          _containsErrorText = null;
+          _priceErrorText = null;
           Navigator.pop(context);
           break;
         case "SQL-ERROR":
@@ -87,6 +103,7 @@ class _InventoryState extends State<Inventory> {
 
   @override
   void initState() {
+    isDisposed = false;
     if (!socket.connected) {
       socket.connect();
     }
@@ -99,20 +116,17 @@ class _InventoryState extends State<Inventory> {
     });
 
     //When an event recieved from server, data is added to the stream
-    socket.onDisconnect((_) {
-      setState(() {
-        status = "Disconnected";
-      });
-    });
+
     socket.on('getProducts', (data) {
       _units = List<String>.from(data['units']);
       _unit = _units[0];
       // List<Product> products = [];
+      products.clear();
       for (var element in data['data']) {
         products.add(Product.fromJson(element));
       }
     });
-    Future.delayed(const Duration(seconds: 1), (() {
+    Future.delayed(const Duration(seconds: 2), (() {
       streamSocket.addResponse(products);
     }));
     _id = TextEditingController();
@@ -120,15 +134,24 @@ class _InventoryState extends State<Inventory> {
     _contains = TextEditingController();
     _price = TextEditingController();
     super.initState();
+    socket.onDisconnect((_) {
+      if (!isDisposed) {
+        setState(() {
+          status = "Disconnected";
+        });
+      }
+    });
   }
 
   @override
   void dispose() {
+    isDisposed = true;
     socket.dispose();
     _id.dispose();
     _productName.dispose();
     _contains.dispose();
     _price.dispose();
+    streamSocket.dispose();
     super.dispose();
   }
 
@@ -153,7 +176,7 @@ class _InventoryState extends State<Inventory> {
                         Row(
                           children: [
                             Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: padding,
                               child: TextButton(
                                 onPressed: () {
                                   showDialog(
@@ -176,10 +199,9 @@ class _InventoryState extends State<Inventory> {
                                                           CrossAxisAlignment
                                                               .end,
                                                       children: [
-                                                        const Padding(
-                                                          padding:
-                                                              EdgeInsets.all(8),
-                                                          child: Text(
+                                                        Padding(
+                                                          padding: padding,
+                                                          child: const Text(
                                                             "Add Product",
                                                             style: TextStyle(
                                                               fontSize: 20,
@@ -194,8 +216,7 @@ class _InventoryState extends State<Inventory> {
                                                             Flexible(
                                                               child: Padding(
                                                                 padding:
-                                                                    const EdgeInsets
-                                                                        .all(8),
+                                                                    padding,
                                                                 child:
                                                                     TextField(
                                                                   // enabled: false,
@@ -221,8 +242,7 @@ class _InventoryState extends State<Inventory> {
                                                             Flexible(
                                                               child: Padding(
                                                                 padding:
-                                                                    const EdgeInsets
-                                                                        .all(8),
+                                                                    padding,
                                                                 child:
                                                                     TextField(
                                                                   controller:
@@ -247,8 +267,7 @@ class _InventoryState extends State<Inventory> {
                                                             Flexible(
                                                               child: Padding(
                                                                 padding:
-                                                                    const EdgeInsets
-                                                                        .all(8),
+                                                                    padding,
                                                                 child:
                                                                     TextField(
                                                                   keyboardType:
@@ -271,9 +290,7 @@ class _InventoryState extends State<Inventory> {
                                                               ),
                                                             ),
                                                             Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .all(8),
+                                                              padding: padding,
                                                               child:
                                                                   DropdownButton(
                                                                 value: _unit,
@@ -301,8 +318,7 @@ class _InventoryState extends State<Inventory> {
                                                             Flexible(
                                                               child: Padding(
                                                                 padding:
-                                                                    const EdgeInsets
-                                                                        .all(8),
+                                                                    padding,
                                                                 child:
                                                                     TextField(
                                                                   keyboardType:
@@ -330,14 +346,43 @@ class _InventoryState extends State<Inventory> {
                                                           ],
                                                         ),
                                                         Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(8.0),
+                                                          padding: padding,
                                                           child: TextButton(
                                                               onPressed: () {
-                                                                addProduct(
-                                                                    context,
-                                                                    setState);
+                                                                setState(() {
+                                                                  _idErrorText =
+                                                                      (_id.text !=
+                                                                              "")
+                                                                          ? null
+                                                                          : "This field can't be empty";
+                                                                  _productNameErrorText =
+                                                                      (_productName.text !=
+                                                                              "")
+                                                                          ? null
+                                                                          : "This field can't be empty";
+                                                                  _containsErrorText =
+                                                                      (_contains.text !=
+                                                                              "")
+                                                                          ? null
+                                                                          : "This field can't be empty";
+                                                                  _priceErrorText =
+                                                                      (_price.text !=
+                                                                              "")
+                                                                          ? null
+                                                                          : "This field can't be empty";
+                                                                });
+                                                                if (_idErrorText != null ||
+                                                                    _productNameErrorText !=
+                                                                        null ||
+                                                                    _containsErrorText !=
+                                                                        null ||
+                                                                    _priceErrorText !=
+                                                                        null) {
+                                                                } else {
+                                                                  addProduct(
+                                                                      context,
+                                                                      setState);
+                                                                }
                                                               },
                                                               style: ButtonStyle(
                                                                   backgroundColor:
@@ -368,16 +413,17 @@ class _InventoryState extends State<Inventory> {
                                         Colors.green)),
                                 child: const Text(
                                   "Add Product",
-                                  style: TextStyle(color: Colors.black),
+                                  style: TextStyle(
+                                      color: Colors.black, fontSize: 30),
                                 ),
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.all(8),
+                              padding: padding,
                               child: Text(
                                 "Status:  $status",
                                 style: const TextStyle(
-                                  fontSize: 10,
+                                  fontSize: 30,
                                 ),
                               ),
                             ),
@@ -387,34 +433,49 @@ class _InventoryState extends State<Inventory> {
                             columns: List<DataColumn>.generate(
                                 columnNames.length,
                                 (index) => DataColumn(
-                                    label: Text(columnNames[index]))),
+                                        label: Text(
+                                      columnNames[index],
+                                      style: dataTableStyle,
+                                    ))),
                             rows: List<DataRow>.generate(
                                 (snapshot.data as List<Product>).length,
                                 (index) => DataRow(cells: <DataCell>[
-                                      DataCell(Text((snapshot.data
-                                              as List<Product>)[index]
-                                          .id
-                                          .toString())),
-                                      DataCell(Text((snapshot.data
-                                              as List<Product>)[index]
-                                          .productName
-                                          .toString())),
-                                      DataCell(Text((snapshot.data
-                                              as List<Product>)[index]
-                                          .contains
-                                          .toString())),
-                                      DataCell(Text((snapshot.data
-                                              as List<Product>)[index]
-                                          .unit
-                                          .toString())),
-                                      DataCell(Text((snapshot.data
-                                              as List<Product>)[index]
-                                          .price
-                                          .toString())),
-                                      DataCell(Text((snapshot.data
-                                              as List<Product>)[index]
-                                          .qty
-                                          .toString())),
+                                      DataCell(Text(
+                                          (snapshot.data
+                                                  as List<Product>)[index]
+                                              .id
+                                              .toString(),
+                                          style: dataTableStyle)),
+                                      DataCell(Text(
+                                          (snapshot.data
+                                                  as List<Product>)[index]
+                                              .productName
+                                              .toString(),
+                                          style: dataTableStyle)),
+                                      DataCell(Text(
+                                          (snapshot.data
+                                                  as List<Product>)[index]
+                                              .contains
+                                              .toString(),
+                                          style: dataTableStyle)),
+                                      DataCell(Text(
+                                          (snapshot.data
+                                                  as List<Product>)[index]
+                                              .unit
+                                              .toString(),
+                                          style: dataTableStyle)),
+                                      DataCell(Text(
+                                          (snapshot.data
+                                                  as List<Product>)[index]
+                                              .price
+                                              .toString(),
+                                          style: dataTableStyle)),
+                                      DataCell(Text(
+                                          (snapshot.data
+                                                  as List<Product>)[index]
+                                              .qty
+                                              .toString(),
+                                          style: dataTableStyle)),
                                     ]))),
                       ],
                     ),
