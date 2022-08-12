@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:simple_erp/errors/connection_lost.dart';
 import 'package:simple_erp/home.dart';
 import 'package:simple_erp/users/Objects/ErrorMessage.dart';
 import 'package:simple_erp/users/Objects/User.dart';
@@ -55,134 +56,140 @@ class _LoginPageState extends State<LoginPage> {
         _mail.text = user.mail;
       });
     }
-    if (_isLoading) {
-      return progressBar();
-    } else {
-      return Scaffold(
-          appBar: AppBar(
-            title: const Text("SimpleERP"),
-          ),
-          body: SingleChildScrollView(
-            child: Center(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(0, 30, 0, 0),
-                child: SizedBox(
-                  width: 400,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: Text(
-                          (_flashMessage != null)
-                              ? "Registered as $_flashMessage"
-                              : "",
-                          style: const TextStyle(color: Colors.green),
-                        ),
-                      ),
-                      const Padding(
-                        padding: EdgeInsets.all(8),
-                        child: Text(
-                          "Login",
-                          style: TextStyle(
-                            fontSize: 20,
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: TextField(
-                          controller: _mail,
-                          decoration: InputDecoration(
-                              prefixIcon: const Icon(
-                                Icons.mail,
-                                color: Colors.blue,
-                              ),
-                              border: const OutlineInputBorder(),
-                              hintText: "Gmail",
-                              errorText: _mailErrorText),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: TextField(
-                          controller: _password,
-                          obscureText: true,
-                          decoration: InputDecoration(
-                              prefixIcon: const Icon(
-                                Icons.key,
-                                color: Colors.red,
-                              ),
-                              border: const OutlineInputBorder(),
-                              hintText: "Password",
-                              errorText: _passwordErrorText),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: TextButton(
-                          style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(
-                                  const Color.fromRGBO(211, 211, 211, 1))),
-                          onPressed: () {
-                            setState(() {
-                              // Check if the fields are empty
-                              _mailErrorText = (_mail.text != "")
-                                  ? null
-                                  : "This field can't be empty";
 
-                              _passwordErrorText = (_password.text != "")
-                                  ? null
-                                  : "This field can't be empty";
-
-                              if (_mailErrorText != null ||
-                                  _passwordErrorText != null) {
-                              } else {
-                                try {
-                                  // Display the progress bar
-                                  _isLoading = true;
-                                  futureUser =
-                                      loginUser(_mail.text, _password.text);
-                                  futureUser.then((value) {
-                                    if (value is User) {
-                                      setCurrentUser(
-                                          'current_user', value.toJson());
-
-                                      Navigator.of(context).pushAndRemoveUntil(
-                                          MaterialPageRoute(
-                                              builder: (BuildContext context) =>
-                                                  const Home()),
-                                          (Route<dynamic> route) => false);
-                                    } else {
-                                      setState(() {
-                                        _mailErrorText =
-                                            (value as ErrorText).message;
-                                      });
-                                    }
-                                    setState(() {
-                                      _isLoading = false;
-                                    });
-                                  });
-                                } catch (e) {
-                                  throw Exception(e);
-                                }
-                              }
-                            });
-                          },
-                          child: const Text(
-                            "Login",
-                            style: TextStyle(
-                              color: Colors.black,
+    return Scaffold(
+        appBar: AppBar(
+          title: const Text("SimpleERP"),
+        ),
+        body: _isLoading
+            ? connectionLost("Loggin in to your account", Colors.cyan)
+            : SingleChildScrollView(
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 30, 0, 0),
+                    child: SizedBox(
+                      width: 400,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: Text(
+                              (_flashMessage != null)
+                                  ? "Registered as $_flashMessage"
+                                  : "",
+                              style: const TextStyle(color: Colors.green),
                             ),
                           ),
-                        ),
-                      )
-                    ],
+                          const Padding(
+                            padding: EdgeInsets.all(8),
+                            child: Text(
+                              "Login",
+                              style: TextStyle(
+                                fontSize: 20,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: TextField(
+                              controller: _mail,
+                              decoration: InputDecoration(
+                                  prefixIcon: const Icon(
+                                    Icons.mail,
+                                    color: Colors.blue,
+                                  ),
+                                  border: const OutlineInputBorder(),
+                                  hintText: "Gmail",
+                                  errorText: _mailErrorText),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: TextField(
+                              controller: _password,
+                              obscureText: true,
+                              decoration: InputDecoration(
+                                  prefixIcon: const Icon(
+                                    Icons.key,
+                                    color: Colors.red,
+                                  ),
+                                  border: const OutlineInputBorder(),
+                                  hintText: "Password",
+                                  errorText: _passwordErrorText),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: TextButton(
+                              style: ButtonStyle(
+                                  backgroundColor: MaterialStateProperty.all(
+                                      const Color.fromRGBO(211, 211, 211, 1))),
+                              onPressed: () {
+                                setState(() {
+                                  // Check if the fields are empty
+                                  _mailErrorText = (_mail.text != "")
+                                      ? null
+                                      : "This field can't be empty";
+
+                                  _passwordErrorText = (_password.text != "")
+                                      ? null
+                                      : "This field can't be empty";
+
+                                  if (_mailErrorText != null ||
+                                      _passwordErrorText != null) {
+                                  } else {
+                                    setState(() {
+                                      _isLoading = true;
+                                    });
+                                    try {
+                                      // Display the progress bar
+
+                                      futureUser =
+                                          loginUser(_mail.text, _password.text);
+                                      futureUser.then((value) {
+                                        if (value is User) {
+                                          setCurrentUser(
+                                              'current_user', value.toJson());
+                                          setState(() {
+                                            _isLoading = false;
+                                          });
+                                          Navigator.of(context)
+                                              .pushAndRemoveUntil(
+                                                  MaterialPageRoute(
+                                                      builder:
+                                                          (BuildContext
+                                                                  context) =>
+                                                              const Home()),
+                                                  (Route<dynamic> route) =>
+                                                      false);
+                                        } else {
+                                          setState(() {
+                                            _isLoading = false;
+                                            _mailErrorText =
+                                                (value as ErrorText).message;
+                                          });
+                                        }
+                                      });
+                                    } catch (e) {
+                                      throw Exception(e);
+                                    }
+                                  }
+                                });
+                              },
+                              child: const Text(
+                                "Login",
+                                style: TextStyle(
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-          ));
-    }
+              ));
   }
 }
