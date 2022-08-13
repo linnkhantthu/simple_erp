@@ -5,7 +5,6 @@ import 'package:simple_erp/inventory/Objects/Product.dart';
 import 'package:flutter/services.dart';
 import 'package:simple_erp/inventory/utils.dart';
 import 'package:simple_erp/users/Objects/User.dart';
-import 'package:simple_erp/users/register_page.dart';
 import 'package:simple_erp/users/utils.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:socket_io_client/socket_io_client.dart';
@@ -39,7 +38,7 @@ class _InventoryState extends State<Inventory> {
   var _containsErrorText = null;
   var _priceErrorText = null;
 
-  IO.Socket socket = IO.io('http://192.168.1.90:5000', <String, dynamic>{
+  IO.Socket socket = IO.io('http://192.168.100.13:5000', <String, dynamic>{
     'transports': ['websocket'],
     'autoConnect': false,
   });
@@ -71,6 +70,7 @@ class _InventoryState extends State<Inventory> {
       product = data['data'];
       errorCode = data['errorCode'];
     });
+
     Future.delayed(const Duration(seconds: 1), (() {
       switch (errorCode) {
         case "PASS":
@@ -126,10 +126,11 @@ class _InventoryState extends State<Inventory> {
       for (var element in data['data']) {
         products.add(Product.fromJson(element));
       }
-    });
-    Future.delayed(const Duration(seconds: 2), (() {
       streamSocket.addResponse(products);
-    }));
+    });
+    // Future.delayed(const Duration(seconds: 1), (() {
+    //   streamSocket.addResponse(products);
+    // }));
     _id = TextEditingController();
     _productName = TextEditingController();
     _contains = TextEditingController();
