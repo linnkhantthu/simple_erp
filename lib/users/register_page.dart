@@ -204,7 +204,6 @@ class _RegisterPageState extends State<RegisterPage> {
                                           _mail.text,
                                           _password.text);
                                       futureUser.then((value) {
-                                        print(value);
                                         if (value is User) {
                                           setState(() {
                                             _isLoading = false;

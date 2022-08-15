@@ -96,13 +96,13 @@ class _HomeState extends State<Home> {
                   Icons.logout,
                   color: Colors.red,
                 ),
-                title: const Text("Logout & Exit"),
+                title: const Text("Logout"),
                 onTap: () {
                   Navigator.pop(context);
                   showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
-                      title: const Text("Logout and Exit?"),
+                      title: const Text("Logout"),
                       content: const Text("Are you sure?"),
                       actions: <Widget>[
                         TextButton(
@@ -118,8 +118,8 @@ class _HomeState extends State<Home> {
                               removeCurrentUser("current_user")
                                   .whenComplete(() {
                                 Navigator.pop(context, 'Sure');
-                                SystemChannels.platform
-                                    .invokeMethod('SystemNavigator.pop');
+                                // SystemChannels.platform
+                                //     .invokeMethod('SystemNavigator.pop');
                                 Navigator.of(context).pushAndRemoveUntil(
                                     MaterialPageRoute(
                                         builder: (BuildContext context) =>

@@ -74,7 +74,6 @@ Future<Object> loginUser(String mail, String password) async {
       return const ErrorText(message: "404 not Dound");
     }
   } catch (e) {
-    print(e);
     return const ErrorText(message: "Connection Refused");
   }
 }

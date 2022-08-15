@@ -5,6 +5,7 @@ import 'package:simple_erp/inventory/Objects/Product.dart';
 import 'package:flutter/services.dart';
 import 'package:simple_erp/inventory/utils.dart';
 import 'package:simple_erp/users/Objects/User.dart';
+import 'package:simple_erp/users/register_page.dart';
 import 'package:simple_erp/users/utils.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:socket_io_client/socket_io_client.dart';
@@ -17,8 +18,8 @@ class Inventory extends StatefulWidget {
 }
 
 class _InventoryState extends State<Inventory> {
-  var protocol = dotenv.env['PROTOCOL'];
   var hostname = dotenv.env['HOST_NAME'];
+  bool addingProduct = false;
   final EdgeInsets padding = const EdgeInsets.all(8);
   final TextStyle dataTableStyle = const TextStyle(fontSize: 30);
   late final TextEditingController _id;
@@ -38,10 +39,7 @@ class _InventoryState extends State<Inventory> {
   var _containsErrorText = null;
   var _priceErrorText = null;
 
-  IO.Socket socket = IO.io('http://192.168.100.13:5000', <String, dynamic>{
-    'transports': ['websocket'],
-    'autoConnect': false,
-  });
+  late IO.Socket socket;
   Object? currentUser = getCurrentUser('current_user'); // Get current user
   StreamSocket streamSocket = StreamSocket();
   final List columnNames = [
@@ -50,11 +48,13 @@ class _InventoryState extends State<Inventory> {
     "Contains",
     "Unit",
     "Price",
-    "Qty"
+    "Qty",
+    ""
   ];
 
-  void addProduct(
-      BuildContext context, void Function(void Function()) setState) {
+  Future<void> addProduct(
+      BuildContext context, void Function(void Function()) setState) async {
+    addingProduct = true;
     var the_data = {
       "mail": (currentUser as User).mail,
       "id": _id.text,
@@ -71,9 +71,12 @@ class _InventoryState extends State<Inventory> {
       errorCode = data['errorCode'];
     });
 
-    Future.delayed(const Duration(seconds: 1), (() {
+    await Future.doWhile(() async {
+      await Future.delayed(const Duration(seconds: 0), () {});
+      print(errorCode);
       switch (errorCode) {
         case "PASS":
+          errorCode = null;
           products.add(Product.fromJson(product));
           streamSocket.addResponse(products);
           _id.clear();
@@ -84,58 +87,79 @@ class _InventoryState extends State<Inventory> {
           _productNameErrorText = null;
           _containsErrorText = null;
           _priceErrorText = null;
+
           Navigator.pop(context);
-          break;
+          return false;
+
         case "SQL-ERROR":
+          errorCode = null;
           setState(() {
             _idErrorText = product;
           });
-          break;
+          setState(() => addingProduct = true);
+          return false;
         case "ID-ERROR":
+          errorCode = null;
           setState(() {
             _idErrorText = product;
           });
-          break;
+          setState(() => addingProduct = true);
+          return false;
         default:
-          break;
+          return socket.connected ? true : false;
       }
-    }));
+    });
+    setState(() => addingProduct = false);
   }
 
   @override
   void initState() {
+    // Initialize socket
+    socket = IO.io('http://$hostname', <String, dynamic>{
+      'transports': ['websocket'],
+      'autoConnect': false,
+    });
+
     isDisposed = false;
+
+    // Check if the socket is connected, if not, connect
     if (!socket.connected) {
       socket.connect();
     }
+
+    // If the socket got connected, set the status and send User Object to the server
     socket.onConnect((_) {
       setState(() {
         status = "Connected";
       });
-
       socket.emit('getProducts', currentUser);
     });
 
-    //When an event recieved from server, data is added to the stream
-
+    //The server will emit product list if the user is authenticated
     socket.on('getProducts', (data) {
+      // Init Unit
       _units = List<String>.from(data['units']);
       _unit = _units[0];
-      // List<Product> products = [];
+
+      // Clearing the list that is stored product list. (In case the server restarts)
       products.clear();
+
+      // Add data to the StreamBuilder
       for (var element in data['data']) {
         products.add(Product.fromJson(element));
       }
       streamSocket.addResponse(products);
     });
-    // Future.delayed(const Duration(seconds: 1), (() {
-    //   streamSocket.addResponse(products);
-    // }));
+
+    // Initializing controllers
     _id = TextEditingController();
     _productName = TextEditingController();
     _contains = TextEditingController();
     _price = TextEditingController();
+
     super.initState();
+
+    // If the socket got disconnected (Set status)
     socket.onDisconnect((_) {
       if (!isDisposed) {
         setState(() {
@@ -149,11 +173,14 @@ class _InventoryState extends State<Inventory> {
   void dispose() {
     isDisposed = true;
     socket.dispose();
+
     _id.dispose();
     _productName.dispose();
     _contains.dispose();
     _price.dispose();
+
     streamSocket.dispose();
+
     super.dispose();
   }
 
@@ -195,228 +222,226 @@ class _InventoryState extends State<Inventory> {
                                             builder: (BuildContext context,
                                                 void Function(void Function())
                                                     setState) {
-                                              return AlertDialog(
-                                                actions: [
-                                                  FittedBox(
-                                                    child: Center(
-                                                      child: SizedBox(
-                                                        width: 400,
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .end,
-                                                          children: [
-                                                            Padding(
-                                                              padding: padding,
-                                                              child: const Text(
-                                                                "Add Product",
-                                                                style:
-                                                                    TextStyle(
-                                                                  fontSize: 20,
+                                              if (addingProduct) {
+                                                return progressBar();
+                                              } else {
+                                                return AlertDialog(
+                                                  actions: [
+                                                    FittedBox(
+                                                      child: Center(
+                                                        child: SizedBox(
+                                                          width: 400,
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .end,
+                                                            children: [
+                                                              Padding(
+                                                                padding:
+                                                                    padding,
+                                                                child:
+                                                                    const Text(
+                                                                  "Add Product",
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontSize:
+                                                                        20,
+                                                                  ),
                                                                 ),
                                                               ),
-                                                            ),
-                                                            Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .start,
-                                                              children: [
-                                                                Flexible(
-                                                                  child:
-                                                                      Padding(
+                                                              Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  Flexible(
+                                                                    child:
+                                                                        Padding(
+                                                                      padding:
+                                                                          padding,
+                                                                      child:
+                                                                          TextField(
+                                                                        // enabled: false,
+                                                                        controller:
+                                                                            _id,
+                                                                        keyboardType:
+                                                                            TextInputType.number,
+                                                                        inputFormatters: [
+                                                                          FilteringTextInputFormatter
+                                                                              .digitsOnly
+                                                                        ],
+                                                                        decoration: InputDecoration(
+                                                                            border:
+                                                                                const OutlineInputBorder(),
+                                                                            hintText:
+                                                                                "ID",
+                                                                            errorText:
+                                                                                _idErrorText),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  Flexible(
+                                                                    child:
+                                                                        Padding(
+                                                                      padding:
+                                                                          padding,
+                                                                      child:
+                                                                          TextField(
+                                                                        controller:
+                                                                            _productName,
+                                                                        decoration: InputDecoration(
+                                                                            border:
+                                                                                const OutlineInputBorder(),
+                                                                            hintText:
+                                                                                "Product Name",
+                                                                            errorText:
+                                                                                _productNameErrorText),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  Flexible(
+                                                                    child:
+                                                                        Padding(
+                                                                      padding:
+                                                                          padding,
+                                                                      child:
+                                                                          TextField(
+                                                                        keyboardType:
+                                                                            TextInputType.number,
+                                                                        inputFormatters: [
+                                                                          FilteringTextInputFormatter
+                                                                              .digitsOnly
+                                                                        ],
+                                                                        controller:
+                                                                            _contains,
+                                                                        decoration: InputDecoration(
+                                                                            border:
+                                                                                const OutlineInputBorder(),
+                                                                            hintText:
+                                                                                "Contains",
+                                                                            errorText:
+                                                                                _containsErrorText),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  Padding(
                                                                     padding:
                                                                         padding,
                                                                     child:
-                                                                        TextField(
-                                                                      // enabled: false,
-                                                                      controller:
-                                                                          _id,
-                                                                      keyboardType:
-                                                                          TextInputType
-                                                                              .number,
-                                                                      inputFormatters: [
-                                                                        FilteringTextInputFormatter
-                                                                            .digitsOnly
-                                                                      ],
-                                                                      decoration: InputDecoration(
-                                                                          border:
-                                                                              const OutlineInputBorder(),
-                                                                          hintText:
-                                                                              "ID",
-                                                                          errorText:
-                                                                              _idErrorText),
+                                                                        DropdownButton(
+                                                                      value:
+                                                                          _unit,
+                                                                      onChanged:
+                                                                          (String?
+                                                                              newValue) {
+                                                                        setState(
+                                                                            () {
+                                                                          _unit =
+                                                                              newValue!;
+                                                                        });
+                                                                      },
+                                                                      items: _units.map<
+                                                                          DropdownMenuItem<
+                                                                              String>>((String
+                                                                          value) {
+                                                                        return DropdownMenuItem<
+                                                                            String>(
+                                                                          value:
+                                                                              value,
+                                                                          child:
+                                                                              Text(value),
+                                                                        );
+                                                                      }).toList(),
                                                                     ),
                                                                   ),
-                                                                ),
-                                                                Flexible(
-                                                                  child:
-                                                                      Padding(
-                                                                    padding:
-                                                                        padding,
+                                                                  Flexible(
                                                                     child:
-                                                                        TextField(
-                                                                      controller:
-                                                                          _productName,
-                                                                      decoration: InputDecoration(
-                                                                          border:
-                                                                              const OutlineInputBorder(),
-                                                                          hintText:
-                                                                              "Product Name",
-                                                                          errorText:
-                                                                              _productNameErrorText),
+                                                                        Padding(
+                                                                      padding:
+                                                                          padding,
+                                                                      child:
+                                                                          TextField(
+                                                                        keyboardType:
+                                                                            TextInputType.number,
+                                                                        inputFormatters: [
+                                                                          FilteringTextInputFormatter
+                                                                              .allow(
+                                                                            RegExp(r'(^\d*\.?\d*)'),
+                                                                          ),
+                                                                        ],
+                                                                        controller:
+                                                                            _price,
+                                                                        decoration: InputDecoration(
+                                                                            border:
+                                                                                const OutlineInputBorder(),
+                                                                            hintText:
+                                                                                "Price",
+                                                                            errorText:
+                                                                                _priceErrorText),
+                                                                      ),
                                                                     ),
                                                                   ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                            Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .start,
-                                                              children: [
-                                                                Flexible(
-                                                                  child:
-                                                                      Padding(
-                                                                    padding:
-                                                                        padding,
-                                                                    child:
-                                                                        TextField(
-                                                                      keyboardType:
-                                                                          TextInputType
-                                                                              .number,
-                                                                      inputFormatters: [
-                                                                        FilteringTextInputFormatter
-                                                                            .digitsOnly
-                                                                      ],
-                                                                      controller:
-                                                                          _contains,
-                                                                      decoration: InputDecoration(
-                                                                          border:
-                                                                              const OutlineInputBorder(),
-                                                                          hintText:
-                                                                              "Contains",
-                                                                          errorText:
-                                                                              _containsErrorText),
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                                Padding(
-                                                                  padding:
-                                                                      padding,
-                                                                  child:
-                                                                      DropdownButton(
-                                                                    value:
-                                                                        _unit,
-                                                                    onChanged:
-                                                                        (String?
-                                                                            newValue) {
-                                                                      setState(
-                                                                          () {
-                                                                        _unit =
-                                                                            newValue!;
-                                                                      });
-                                                                    },
-                                                                    items: _units.map<
-                                                                        DropdownMenuItem<
-                                                                            String>>((String
-                                                                        value) {
-                                                                      return DropdownMenuItem<
-                                                                          String>(
-                                                                        value:
-                                                                            value,
-                                                                        child: Text(
-                                                                            value),
-                                                                      );
-                                                                    }).toList(),
-                                                                  ),
-                                                                ),
-                                                                Flexible(
-                                                                  child:
-                                                                      Padding(
-                                                                    padding:
-                                                                        padding,
-                                                                    child:
-                                                                        TextField(
-                                                                      keyboardType:
-                                                                          TextInputType
-                                                                              .number,
-                                                                      inputFormatters: [
-                                                                        FilteringTextInputFormatter
-                                                                            .allow(
-                                                                          RegExp(
-                                                                              r'(^\d*\.?\d*)'),
-                                                                        ),
-                                                                      ],
-                                                                      controller:
-                                                                          _price,
-                                                                      decoration: InputDecoration(
-                                                                          border:
-                                                                              const OutlineInputBorder(),
-                                                                          hintText:
-                                                                              "Price",
-                                                                          errorText:
-                                                                              _priceErrorText),
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                            Padding(
-                                                              padding: padding,
-                                                              child: TextButton(
-                                                                  onPressed:
-                                                                      () {
-                                                                    setState(
-                                                                        () {
-                                                                      _idErrorText = (_id.text !=
-                                                                              "")
-                                                                          ? null
-                                                                          : "This field can't be empty";
-                                                                      _productNameErrorText = (_productName.text !=
-                                                                              "")
-                                                                          ? null
-                                                                          : "This field can't be empty";
-                                                                      _containsErrorText = (_contains.text !=
-                                                                              "")
-                                                                          ? null
-                                                                          : "This field can't be empty";
-                                                                      _priceErrorText = (_price.text !=
-                                                                              "")
-                                                                          ? null
-                                                                          : "This field can't be empty";
-                                                                    });
-                                                                    if (_idErrorText != null ||
-                                                                        _productNameErrorText !=
-                                                                            null ||
-                                                                        _containsErrorText !=
-                                                                            null ||
-                                                                        _priceErrorText !=
-                                                                            null) {
-                                                                    } else {
-                                                                      addProduct(
-                                                                          context,
-                                                                          setState);
-                                                                    }
-                                                                  },
-                                                                  style: ButtonStyle(
-                                                                      backgroundColor:
-                                                                          MaterialStateProperty.all(Colors
-                                                                              .green)),
-                                                                  child:
-                                                                      const Text(
-                                                                    "Add",
-                                                                    style: TextStyle(
-                                                                        color: Colors
-                                                                            .black),
-                                                                  )),
-                                                            )
-                                                          ],
+                                                                ],
+                                                              ),
+                                                              Padding(
+                                                                padding:
+                                                                    padding,
+                                                                child:
+                                                                    TextButton(
+                                                                        onPressed:
+                                                                            () {
+                                                                          setState(
+                                                                              () {
+                                                                            _idErrorText = (_id.text != "")
+                                                                                ? null
+                                                                                : "This field can't be empty";
+                                                                            _productNameErrorText = (_productName.text != "")
+                                                                                ? null
+                                                                                : "This field can't be empty";
+                                                                            _containsErrorText = (_contains.text != "")
+                                                                                ? null
+                                                                                : "This field can't be empty";
+                                                                            _priceErrorText = (_price.text != "")
+                                                                                ? null
+                                                                                : "This field can't be empty";
+                                                                          });
+                                                                          if (_idErrorText != null ||
+                                                                              _productNameErrorText != null ||
+                                                                              _containsErrorText != null ||
+                                                                              _priceErrorText != null) {
+                                                                          } else {
+                                                                            if (socket.connected) {
+                                                                              addProduct(context, setState);
+                                                                            } else {
+                                                                              Navigator.pop(context);
+                                                                            }
+                                                                          }
+                                                                        },
+                                                                        style: ButtonStyle(
+                                                                            backgroundColor: MaterialStateProperty.all(Colors
+                                                                                .green)),
+                                                                        child:
+                                                                            const Text(
+                                                                          "Add",
+                                                                          style:
+                                                                              TextStyle(color: Colors.black),
+                                                                        )),
+                                                              )
+                                                            ],
+                                                          ),
                                                         ),
                                                       ),
                                                     ),
-                                                  ),
-                                                ],
-                                              );
+                                                  ],
+                                                );
+                                              }
                                             },
                                           ),
                                         ),
@@ -491,6 +516,8 @@ class _InventoryState extends State<Inventory> {
                                                   .qty
                                                   .toString(),
                                               style: dataTableStyle)),
+                                          const DataCell(
+                                              Icon(Icons.delete_outline))
                                         ]))),
                           ],
                         ),
