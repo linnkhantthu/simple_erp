@@ -65,7 +65,6 @@ class _InventoryState extends State<Inventory> {
     };
 
     socket.emit('addProduct', the_data);
-
     socket.on('addProduct', (data) {
       product = data['data'];
       errorCode = data['errorCode'];
@@ -73,7 +72,7 @@ class _InventoryState extends State<Inventory> {
 
     await Future.doWhile(() async {
       await Future.delayed(const Duration(seconds: 0), () {});
-      print(errorCode);
+
       switch (errorCode) {
         case "PASS":
           errorCode = null;
