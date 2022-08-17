@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:simple_erp/error_codes.dart';
 import 'package:simple_erp/errors/connection_lost.dart';
 import 'package:simple_erp/inventory/Objects/Product.dart';
 import 'package:flutter/services.dart';
@@ -29,15 +30,16 @@ class _InventoryState extends State<Inventory> {
   late List<String> _units;
   late final TextEditingController _price;
   List<Product> products = [];
-  var product;
-  var errorCode;
+  late Map<String, dynamic> product;
+  late String? errorMessage;
+  String? errorCode;
   String status = "Disconnected";
   bool isDisposed = false;
 
-  var _idErrorText = null;
-  var _productNameErrorText = null;
-  var _containsErrorText = null;
-  var _priceErrorText = null;
+  late String? _idErrorText;
+  late String? _productNameErrorText;
+  late String? _containsErrorText;
+  late String? _priceErrorText;
 
   late IO.Socket socket;
   Object? currentUser = getCurrentUser('current_user'); // Get current user
@@ -66,15 +68,19 @@ class _InventoryState extends State<Inventory> {
 
     socket.emit('addProduct', the_data);
     socket.on('addProduct', (data) {
-      product = data['data'];
       errorCode = data['errorCode'];
+      if (errorCode == ErrorCodes.noError) {
+        product = data['data'];
+      } else {
+        errorMessage = data['data'];
+      }
     });
 
     await Future.doWhile(() async {
       await Future.delayed(const Duration(seconds: 0), () {});
 
       switch (errorCode) {
-        case "PASS":
+        case ErrorCodes.noError:
           errorCode = null;
           products.add(Product.fromJson(product));
           streamSocket.addResponse(products);
@@ -90,17 +96,17 @@ class _InventoryState extends State<Inventory> {
           Navigator.pop(context);
           return false;
 
-        case "SQL-ERROR":
+        case ErrorCodes.sqlError:
           errorCode = null;
           setState(() {
-            _idErrorText = product;
+            _idErrorText = errorMessage;
           });
           setState(() => addingProduct = true);
           return false;
-        case "ID-ERROR":
+        case ErrorCodes.productIdUniqueError:
           errorCode = null;
           setState(() {
-            _idErrorText = product;
+            _idErrorText = errorMessage;
           });
           setState(() => addingProduct = true);
           return false;
@@ -150,11 +156,17 @@ class _InventoryState extends State<Inventory> {
       streamSocket.addResponse(products);
     });
 
+    errorCode = null;
     // Initializing controllers
     _id = TextEditingController();
     _productName = TextEditingController();
     _contains = TextEditingController();
     _price = TextEditingController();
+
+    _idErrorText = null;
+    _productNameErrorText = null;
+    _containsErrorText = null;
+    _priceErrorText = null;
 
     super.initState();
 
