@@ -5,6 +5,7 @@ import 'package:simple_erp/errors/connection_lost.dart';
 import 'package:simple_erp/inventory/Objects/Product.dart';
 import 'package:flutter/services.dart';
 import 'package:simple_erp/inventory/utils.dart';
+import 'package:simple_erp/users/Objects/ErrorMessage.dart';
 import 'package:simple_erp/users/Objects/User.dart';
 import 'package:simple_erp/users/register_page.dart';
 import 'package:simple_erp/users/utils.dart';
@@ -53,69 +54,6 @@ class _InventoryState extends State<Inventory> {
     "Qty",
     ""
   ];
-
-  Future<void> addProduct(
-      BuildContext context, void Function(void Function()) setState) async {
-    addingProduct = true;
-    var the_data = {
-      "mail": (currentUser as User).mail,
-      "id": _id.text,
-      "productName": _productName.text,
-      "contains": _contains.text,
-      "unit": _unit,
-      "price": _price.text
-    };
-
-    socket.emit('addProduct', the_data);
-    socket.on('addProduct', (data) {
-      errorCode = data['errorCode'];
-      if (errorCode == ErrorCodes.noError) {
-        product = data['data'];
-      } else {
-        errorMessage = data['data'];
-      }
-    });
-
-    await Future.doWhile(() async {
-      await Future.delayed(const Duration(seconds: 0), () {});
-
-      switch (errorCode) {
-        case ErrorCodes.noError:
-          errorCode = null;
-          products.add(Product.fromJson(product));
-          streamSocket.addResponse(products);
-          _id.clear();
-          _productName.clear();
-          _contains.clear();
-          _price.clear();
-          _idErrorText = null;
-          _productNameErrorText = null;
-          _containsErrorText = null;
-          _priceErrorText = null;
-
-          Navigator.pop(context);
-          return false;
-
-        case ErrorCodes.sqlError:
-          errorCode = null;
-          setState(() {
-            _idErrorText = errorMessage;
-          });
-          setState(() => addingProduct = true);
-          return false;
-        case ErrorCodes.productIdUniqueError:
-          errorCode = null;
-          setState(() {
-            _idErrorText = errorMessage;
-          });
-          setState(() => addingProduct = true);
-          return false;
-        default:
-          return socket.connected ? true : false;
-      }
-    });
-    setState(() => addingProduct = false);
-  }
 
   @override
   void initState() {
@@ -527,8 +465,28 @@ class _InventoryState extends State<Inventory> {
                                                   .qty
                                                   .toString(),
                                               style: dataTableStyle)),
-                                          const DataCell(
-                                              Icon(Icons.delete_outline))
+                                          DataCell(
+                                            const Icon(Icons.delete_outline),
+                                            onTap: () {
+                                              deleteProduct((snapshot.data
+                                                              as List<Product>)[
+                                                          index]
+                                                      .id)
+                                                  .then((value) {
+                                                if (value is Product) {
+                                                  products.removeWhere(
+                                                      (element) =>
+                                                          element.id ==
+                                                          value.id);
+                                                  streamSocket
+                                                      .addResponse(products);
+                                                } else {
+                                                  print((value as ErrorText)
+                                                      .message);
+                                                }
+                                              });
+                                            },
+                                          )
                                         ]))),
                           ],
                         ),
@@ -544,5 +502,68 @@ class _InventoryState extends State<Inventory> {
         }
       },
     );
+  }
+
+  Future<void> addProduct(
+      BuildContext context, void Function(void Function()) setState) async {
+    addingProduct = true;
+    var dataToSend = {
+      "mail": (currentUser as User).mail,
+      "id": _id.text,
+      "productName": _productName.text,
+      "contains": _contains.text,
+      "unit": _unit,
+      "price": _price.text
+    };
+
+    socket.emit('addProduct', dataToSend);
+    socket.on('addProduct', (data) {
+      errorCode = data['errorCode'];
+      if (errorCode == ErrorCodes.noError) {
+        product = data['data'];
+      } else {
+        errorMessage = data['data'];
+      }
+    });
+
+    await Future.doWhile(() async {
+      await Future.delayed(const Duration(seconds: 0), () {});
+
+      switch (errorCode) {
+        case ErrorCodes.noError:
+          errorCode = null;
+          products.add(Product.fromJson(product));
+          streamSocket.addResponse(products);
+          _id.clear();
+          _productName.clear();
+          _contains.clear();
+          _price.clear();
+          _idErrorText = null;
+          _productNameErrorText = null;
+          _containsErrorText = null;
+          _priceErrorText = null;
+
+          Navigator.pop(context);
+          return false;
+
+        case ErrorCodes.sqlError:
+          errorCode = null;
+          setState(() {
+            _idErrorText = errorMessage;
+          });
+          setState(() => addingProduct = true);
+          return false;
+        case ErrorCodes.productIdUniqueError:
+          errorCode = null;
+          setState(() {
+            _idErrorText = errorMessage;
+          });
+          setState(() => addingProduct = true);
+          return false;
+        default:
+          return socket.connected ? true : false;
+      }
+    });
+    setState(() => addingProduct = false);
   }
 }
