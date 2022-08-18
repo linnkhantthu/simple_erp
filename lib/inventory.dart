@@ -467,25 +467,60 @@ class _InventoryState extends State<Inventory> {
                                               style: dataTableStyle)),
                                           DataCell(
                                             const Icon(Icons.delete_outline),
-                                            onTap: () {
-                                              deleteProduct((snapshot.data
-                                                              as List<Product>)[
-                                                          index]
-                                                      .id)
-                                                  .then((value) {
-                                                if (value is Product) {
-                                                  products.removeWhere(
-                                                      (element) =>
-                                                          element.id ==
-                                                          value.id);
-                                                  streamSocket
-                                                      .addResponse(products);
-                                                } else {
-                                                  print((value as ErrorText)
-                                                      .message);
-                                                }
-                                              });
-                                            },
+                                            onTap: () => showDialog(
+                                                context: context,
+                                                builder:
+                                                    (context) => AlertDialog(
+                                                          title: Text(
+                                                              "Delete product ID: ${(snapshot.data as List<Product>)[index].id}"),
+                                                          content: const Text(
+                                                              "Are you sure ?"),
+                                                          actions: <Widget>[
+                                                            TextButton(
+                                                                onPressed: () {
+                                                                  Navigator.pop(
+                                                                      context);
+                                                                },
+                                                                child: const Text(
+                                                                    "Cancel")),
+                                                            TextButton(
+                                                                onPressed: () {
+                                                                  deleteProduct(
+                                                                          (snapshot.data as List<Product>)[index]
+                                                                              .id)
+                                                                      .then(
+                                                                          (value) {
+                                                                    if (value
+                                                                        is Product) {
+                                                                      products.removeWhere((element) =>
+                                                                          element
+                                                                              .id ==
+                                                                          value
+                                                                              .id);
+                                                                      streamSocket
+                                                                          .addResponse(
+                                                                              products);
+                                                                    } else {
+                                                                      print((value
+                                                                              as ErrorText)
+                                                                          .message);
+                                                                    }
+                                                                  });
+                                                                  Navigator.pop(
+                                                                      context);
+                                                                },
+                                                                style: ButtonStyle(
+                                                                    foregroundColor:
+                                                                        MaterialStateProperty.all(Colors
+                                                                            .black),
+                                                                    backgroundColor:
+                                                                        MaterialStateProperty.all(Colors
+                                                                            .red)),
+                                                                child:
+                                                                    const Text(
+                                                                        "Sure"))
+                                                          ],
+                                                        )),
                                           )
                                         ]))),
                           ],

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:simple_erp/dashboard.dart';
 import 'package:simple_erp/inventory.dart';
+import 'package:simple_erp/inventory/purchase.dart';
 import 'package:simple_erp/users/Objects/ErrorMessage.dart';
 import 'package:simple_erp/users/Objects/User.dart';
 import 'package:simple_erp/users/login_page.dart';
@@ -20,6 +21,7 @@ class _HomeState extends State<Home> {
   bool _isLoading = false;
   String routeName = "Dashboard";
   Widget _homeWidget = const Dashboard();
+  bool _inventorySubtitle = false;
 
   @override
   void initState() {
@@ -77,20 +79,41 @@ class _HomeState extends State<Home> {
                   Navigator.pop(context);
                 },
               ),
-              ListTile(
-                leading: const Icon(
-                  Icons.inventory,
-                  color: Colors.orange,
-                ),
-                title: const Text("Inventory"),
-                onTap: () {
-                  setState(() {
-                    routeName = "Inventory";
-                    _homeWidget = const Inventory();
-                  });
-                  Navigator.pop(context);
-                },
-              ),
+              ExpansionTile(
+                  leading: const Icon(
+                    Icons.inventory,
+                    color: Colors.orange,
+                  ),
+                  title: InkWell(
+                    child: const Text("Inventory"),
+                    onTap: () {
+                      setState(() {
+                        routeName = "Inventory";
+                        _homeWidget = const Inventory();
+                      });
+                      Navigator.pop(context);
+                    },
+                  ),
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(50, 0, 0, 0),
+                      child: ListTile(
+                        leading: const Icon(
+                          Icons.shopping_bag,
+                          color: Colors.green,
+                        ),
+                        contentPadding: EdgeInsets.zero,
+                        title: const Text("Purchase"),
+                        onTap: () {
+                          setState(() {
+                            routeName = "Purchase";
+                            _homeWidget = const Purchase();
+                          });
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ),
+                  ]),
               ListTile(
                 leading: const Icon(
                   Icons.logout,
