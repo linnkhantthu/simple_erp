@@ -1,18 +1,16 @@
 import 'dart:convert';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:simple_erp/configs.dart';
 import 'package:simple_erp/users/Objects/ErrorMessage.dart';
 import 'package:simple_erp/users/Objects/User.dart';
 
-var protocol = dotenv.env['PROTOCOL'];
-var hostname = dotenv.env['HOST_NAME'];
-var port = dotenv.env['PORT'];
 final box = GetStorage();
 
 Future<Object> registerUser(
     String firstName, String lastName, String mail, String password) async {
-  final url = Uri.parse("$protocol://$hostname/register");
+  final url = Uri.parse("${Config.apiURI}/register");
   final headers = {
     "Content-Type": "application/json",
   };
@@ -46,7 +44,7 @@ Future<Object> registerUser(
 }
 
 Future<Object> loginUser(String mail, String password) async {
-  final url = Uri.parse("$protocol://$hostname/login");
+  final url = Uri.parse("${Config.apiURI}/login");
   final headers = {
     "Content-Type": "application/json",
   };

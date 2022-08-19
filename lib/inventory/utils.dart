@@ -1,20 +1,16 @@
 import 'dart:convert';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:simple_erp/configs.dart';
 import 'package:simple_erp/inventory/Objects/Product.dart';
 import 'package:simple_erp/users/Objects/ErrorMessage.dart';
 import 'package:simple_erp/users/Objects/User.dart';
 import 'package:simple_erp/users/utils.dart';
 import 'dart:async';
 
-var protocol = dotenv.env['PROTOCOL'];
-var hostname = dotenv.env['HOST_NAME'];
-var port = dotenv.env['PORT'];
-
 Future<List<Object>> fetchInventory() async {
   var currentUser = getCurrentUser('current_user');
   var mail = (currentUser as User).mail;
-  final url = Uri.parse("$protocol://$hostname/inventory");
+  final url = Uri.parse("${Config.apiURI}/inventory");
   final headers = {
     "Content-Type": "application/json",
   };
@@ -69,7 +65,7 @@ class StreamSocket {
 Future<Object> deleteProduct(productId) async {
   var currentUser = getCurrentUser('current_user');
   var mail = (currentUser as User).mail;
-  final url = Uri.parse("$protocol://$hostname/delete_product");
+  final url = Uri.parse("${Config.apiURI}/delete_product");
   final headers = {
     "Content-Type": "application/json",
   };

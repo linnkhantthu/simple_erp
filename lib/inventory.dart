@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:simple_erp/configs.dart';
 import 'package:simple_erp/error_codes.dart';
 import 'package:simple_erp/errors/connection_lost.dart';
 import 'package:simple_erp/inventory/Objects/Product.dart';
@@ -20,7 +20,6 @@ class Inventory extends StatefulWidget {
 }
 
 class _InventoryState extends State<Inventory> {
-  var hostname = dotenv.env['HOST_NAME'];
   bool addingProduct = false;
   final EdgeInsets padding = const EdgeInsets.all(8);
   final TextStyle dataTableStyle = const TextStyle(fontSize: 30);
@@ -58,7 +57,7 @@ class _InventoryState extends State<Inventory> {
   @override
   void initState() {
     // Initialize socket
-    socket = IO.io('http://$hostname', <String, dynamic>{
+    socket = IO.io(Config.apiURI, <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
     });
