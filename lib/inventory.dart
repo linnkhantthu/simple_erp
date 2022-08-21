@@ -26,9 +26,10 @@ class _InventoryState extends State<Inventory> {
   late final TextEditingController _id;
   late final TextEditingController _productName;
   late final TextEditingController _contains;
+  late final TextEditingController _price;
   late String _unit;
   late List<String> _units;
-  late final TextEditingController _price;
+
   List<Product> products = [];
   late Map<String, dynamic> product;
   late String? errorMessage;

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:simple_erp/inventory/Objects/Product.dart';
+import 'package:searchfield/searchfield.dart';
 
 class Purchase extends StatefulWidget {
   const Purchase({Key? key}) : super(key: key);
@@ -18,6 +19,48 @@ class _PurchaseState extends State<Purchase> {
     "Qty",
     ""
   ];
+  List<Product> searchProducts = [
+    const Product(
+        id: 1,
+        productName: "productName1",
+        contains: 1,
+        unit: "PCS",
+        price: 2500.0,
+        qty: 0),
+    const Product(
+        id: 2,
+        productName: "productName2",
+        contains: 2,
+        unit: "KG",
+        price: 3000.0,
+        qty: 0),
+    const Product(
+        id: 3,
+        productName: "productName3",
+        contains: 3,
+        unit: "G",
+        price: 3500.0,
+        qty: 0),
+    const Product(
+        id: 4,
+        productName: "productName4",
+        contains: 4,
+        unit: "LB",
+        price: 4500.0,
+        qty: 0),
+    const Product(
+        id: 5,
+        productName: "productName5",
+        contains: 5,
+        unit: "CM",
+        price: 5500.0,
+        qty: 0),
+  ];
+  late final TextEditingController _id;
+  late final TextEditingController _productName;
+  late final TextEditingController _contains;
+  late final TextEditingController _price;
+
   final TextStyle dataTableStyle = const TextStyle(fontSize: 30);
   List<Product> products = [
     const Product(
@@ -53,16 +96,28 @@ class _PurchaseState extends State<Purchase> {
       ),
     );
     dataRows.add(
-      const DataRow(
+      DataRow(
         cells: <DataCell>[
-          DataCell(TextField()),
+          DataCell(SizedBox(
+            width: 50,
+            child: SearchField<Product>(
+              suggestions: searchProducts
+                  .map(
+                    (e) => SearchFieldListItem(
+                      e.id.toString(),
+                      item: e,
+                    ),
+                  )
+                  .toList(),
+            ),
+          )),
           DataCell(TextField()),
           DataCell(TextField()),
           DataCell(TextField()),
           DataCell(TextField()),
           DataCell(TextField()),
           DataCell(
-            Icon(Icons.delete_outline),
+            Icon(Icons.add),
           ),
         ],
       ),
