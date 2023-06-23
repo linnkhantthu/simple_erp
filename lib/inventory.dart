@@ -550,6 +550,7 @@ class _InventoryState extends State<Inventory> {
       "unit": _unit,
       "price": _price.text
     };
+    // var newProduct = Product(id: id, product_id: product_id, productName: productName, contains: contains, unit: unit, price: price, qty: qty)
 
     socket.emit('addProduct', dataToSend);
     socket.on('addProduct', (data) {

@@ -1,11 +1,12 @@
 class Product {
   final int id;
-  final product_id;
+  final int product_id;
   final String productName;
   final int contains;
   final String unit;
   final double price;
-  final int qty;
+  final double qty;
+  final user_id;
 
   const Product(
       {required this.id,
@@ -14,17 +15,20 @@ class Product {
       required this.contains,
       required this.unit,
       required this.price,
-      required this.qty});
+      required this.qty,
+      required this.user_id});
 
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
-        id: json['id'],
-        productName: json['productName'],
-        contains: json['contains'],
-        unit: json['unit'],
-        price: json['price'],
-        qty: json['qty'],
-        product_id: json['product_id']);
+      id: json['id'],
+      product_id: json['product_id'],
+      productName: json['productName'],
+      contains: json['contains'],
+      unit: json['unit'],
+      price: json['price'],
+      qty: json['qty'],
+      user_id: json['user_id'],
+    );
   }
 
   Map<String, dynamic> toJson() => {
@@ -34,6 +38,7 @@ class Product {
         'contains': contains,
         'unit': unit,
         'price': price,
-        'qty': qty
+        'qty': qty,
+        'user_id': user_id,
       };
 }
