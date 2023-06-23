@@ -29,16 +29,16 @@ class _LoginPageState extends State<LoginPage> {
     print("Login Page: Checking if the user is authenticated ...");
     var currentUser = getCurrentUser('current_user');
     if (currentUser is User) {
-    print("Login Page: The user is authenticated as "+ currentUser.firstName);
+      print(
+          "Login Page: The user is authenticated as " + currentUser.firstName);
       _isLoading = true;
       WidgetsBinding.instance.addPostFrameCallback(
         (_) => Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (BuildContext context) => const Home()),
             (Route<dynamic> route) => false),
       );
-    }
-    else{
-    print("Login Page: The user is not authenticated, need to login.");
+    } else {
+      print("Login Page: The user is not authenticated, need to login.");
     }
     super.initState();
   }
@@ -56,7 +56,7 @@ class _LoginPageState extends State<LoginPage> {
     // Check if the there are any Args/ if args is not null show it to the user
     final args = ModalRoute.of(context)!.settings.arguments;
     if (args != null) {
-      print("Login Page: Got Args"+ (args as User).user.mail);
+      print("Login Page: Got Args" + (args as User).mail);
       final user = args as User;
       setState(() {
         _flashMessage = user.mail;
