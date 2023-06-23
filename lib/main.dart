@@ -7,7 +7,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:simple_erp/users/utils.dart';
 
 Future<void> main() async {
-  // await dotenv.load(fileName: ".env");
+  // init storage
   await GetStorage.init();
 
   runApp(const MyApp());
@@ -18,11 +18,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Checking if the user is authenticated
+    print("Main: Checking if the user is authenticated ... ");
     var currentUser = getCurrentUser("current_user");
     var initialRoute = "/";
     if (currentUser is User) {
+      // If the user is authenticated redirect to Home Page
+      print("Main: User is authenticated by${currentUser.firstName}");
       initialRoute = "/home";
+    } else {
+      print("Main: The user is not authenticated, redirecting to Register Page...");
     }
+
     return MaterialApp(
       title: "SimpleERP",
       theme: ThemeData(primarySwatch: Colors.grey),

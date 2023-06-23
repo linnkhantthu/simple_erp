@@ -25,16 +25,18 @@ class _HomeState extends State<Home> {
 
   @override
   void initState() {
+    // Check if the user is authenticated
     currentUser = getCurrentUser('current_user');
     if (currentUser is ErrorText) {
       _isLoading = true;
-      WidgetsBinding.instance.addPostFrameCallback((_) => {
-            Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(
-                    builder: (BuildContext context) => const LoginPage()),
-                (Route<dynamic> route) => false),
-          });
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(
+                builder: (BuildContext context) => const LoginPage()),
+            (Route<dynamic> route) => false),
+      );
     }
+
     super.initState();
   }
 

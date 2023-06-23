@@ -19,21 +19,26 @@ class _LoginPageState extends State<LoginPage> {
   var _mailErrorText = null;
   var _passwordErrorText = null;
   late Future<Object> futureUser;
-  bool _isLoading = false;
+  bool _isLoading = false; // For loading screen
 
   @override
   void initState() {
     _mail = TextEditingController();
     _password = TextEditingController();
+    // Checking if the user is authenticated
+    print("Login Page: Checking if the user is authenticated ...");
     var currentUser = getCurrentUser('current_user');
     if (currentUser is User) {
+    print("Login Page: The user is authenticated as "+ currentUser.firstName);
       _isLoading = true;
-      WidgetsBinding.instance.addPostFrameCallback((_) => {
-            Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(
-                    builder: (BuildContext context) => const Home()),
-                (Route<dynamic> route) => false),
-          });
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (BuildContext context) => const Home()),
+            (Route<dynamic> route) => false),
+      );
+    }
+    else{
+    print("Login Page: The user is not authenticated, need to login.");
     }
     super.initState();
   }
@@ -48,8 +53,10 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Check if the there are any Args/ if args is not null show it to the user
     final args = ModalRoute.of(context)!.settings.arguments;
     if (args != null) {
+      print("Login Page: Got Args"+ (args as User).user.mail);
       final user = args as User;
       setState(() {
         _flashMessage = user.mail;
@@ -149,6 +156,8 @@ class _LoginPageState extends State<LoginPage> {
                                           loginUser(_mail.text, _password.text);
                                       futureUser.then((value) {
                                         if (value is User) {
+                                          print("Logged in successfully as " +
+                                              value.firstName);
                                           setCurrentUser(
                                               'current_user', value.toJson());
                                           setState(() {
@@ -164,6 +173,7 @@ class _LoginPageState extends State<LoginPage> {
                                                   (Route<dynamic> route) =>
                                                       false);
                                         } else {
+                                          print("Logged in Failed");
                                           setState(() {
                                             _isLoading = false;
                                             _mailErrorText =

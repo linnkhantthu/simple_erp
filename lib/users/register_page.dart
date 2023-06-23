@@ -40,15 +40,16 @@ class _RegisterPageState extends State<RegisterPage> {
     _confirmPassword = TextEditingController();
     var currentUser = getCurrentUser('current_user');
 
+    // Checking if the user is authenticated
     if (currentUser is User) {
       _isLoading = true;
-      WidgetsBinding.instance.addPostFrameCallback((_) => {
-            Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(
-                    builder: (BuildContext context) => const Home()),
-                (Route<dynamic> route) => false),
-          });
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (BuildContext context) => const Home()),
+            (Route<dynamic> route) => false),
+      );
     }
+
     super.initState();
   }
 
@@ -198,11 +199,13 @@ class _RegisterPageState extends State<RegisterPage> {
                                     });
                                     try {
                                       // Display the progress bar
+                                      // Registering User
                                       futureUser = registerUser(
                                           _firstName.text,
                                           _lastName.text,
                                           _mail.text,
                                           _password.text);
+                                      // if the server return the registered user redirect to Login Page with user values
                                       futureUser.then((value) {
                                         if (value is User) {
                                           setState(() {
