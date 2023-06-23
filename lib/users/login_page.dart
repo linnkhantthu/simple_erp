@@ -156,8 +156,8 @@ class _LoginPageState extends State<LoginPage> {
                                           loginUser(_mail.text, _password.text);
                                       futureUser.then((value) {
                                         if (value is User) {
-                                          print("Logged in successfully as " +
-                                              value.firstName);
+                                          print(
+                                              "Logged in successfully as ${value}");
                                           setCurrentUser(
                                               'current_user', value.toJson());
                                           setState(() {
@@ -173,7 +173,8 @@ class _LoginPageState extends State<LoginPage> {
                                                   (Route<dynamic> route) =>
                                                       false);
                                         } else {
-                                          print("Logged in Failed");
+                                          print(
+                                              "Logged in Failed${(value as ErrorText).message}");
                                           setState(() {
                                             _isLoading = false;
                                             _mailErrorText =
